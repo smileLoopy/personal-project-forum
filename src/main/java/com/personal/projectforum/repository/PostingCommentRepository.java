@@ -7,3 +7,5 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource
 public interface PostingCommentRepository extends JpaRepository<PostingComment, Long> {
 }
+
+

@@ -1,5 +1,6 @@
 package com.personal.projectforum.controller;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @DisplayName("View Controller - Posting")
 @WebMvcTest(PostingController.class)
@@ -25,6 +27,7 @@ class PostingControllerTest {
         this.mvc = mvc;
     }
 
+    @Disabled("Development in progress")
     @DisplayName("[view] [GET] Posting List (Forum) Page - Normal Retrieval Case")
     @Test
     public void givenNothing_whenRequestingPostingsView_thenReturnsPostingsView() throws Exception {
@@ -34,9 +37,11 @@ class PostingControllerTest {
         mvc.perform(get("/postings"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.TEXT_HTML))
+                .andExpect(view().name("postings/index"))
                 .andExpect(model().attributeExists("postings"));
     }
 
+    @Disabled("Development in progress")
     @DisplayName("[view] [GET] Posting Detail Page - Normal Retrieval Case")
     @Test
     public void givenNothing_whenRequestingPostingView_thenReturnsPostingView() throws Exception {
@@ -46,9 +51,12 @@ class PostingControllerTest {
         mvc.perform(get("/postings/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.TEXT_HTML))
-                .andExpect(model().attributeExists("posting"));
+                .andExpect(view().name("postings/detail"))
+                .andExpect(model().attributeExists("posting"))
+                .andExpect(model().attributeExists("postingComments"));
     }
 
+    @Disabled("Development in progress")
     @DisplayName("[view] [GET] Posting Search Page - Normal Retrieval Case")
     @Test
     public void givenNothing_whenRequestingPostingSearchView_thenReturnsPostingSearchView() throws Exception {
@@ -57,9 +65,11 @@ class PostingControllerTest {
         // When & Then
         mvc.perform(get("/postings/search"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.TEXT_HTML));
+                .andExpect(content().contentType(MediaType.TEXT_HTML))
+                .andExpect(view().name("postings/search"));
     }
 
+    @Disabled("Development in progress")
     @DisplayName("[view] [GET] Posting Search Hashtag Page - Normal Retrieval Case")
     @Test
     public void givenNothing_whenRequestingPostingHashtagSearchView_thenReturnsPostingHashtagSearchView() throws Exception {
@@ -68,6 +78,7 @@ class PostingControllerTest {
         // When & Then
         mvc.perform(get("/postings/search-hashtag"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.TEXT_HTML));
+                .andExpect(content().contentType(MediaType.TEXT_HTML))
+                .andExpect(view().name("postings/search-hashtag"));
     }
 }

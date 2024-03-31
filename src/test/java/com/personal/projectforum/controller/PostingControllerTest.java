@@ -27,7 +27,6 @@ class PostingControllerTest {
         this.mvc = mvc;
     }
 
-    @Disabled("Development in progress")
     @DisplayName("[view] [GET] Posting List (Forum) Page - Normal Retrieval Case")
     @Test
     public void givenNothing_whenRequestingPostingsView_thenReturnsPostingsView() throws Exception {
@@ -36,7 +35,7 @@ class PostingControllerTest {
         // When & Then
         mvc.perform(get("/postings"))
                 .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.TEXT_HTML))
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("postings/index"))
                 .andExpect(model().attributeExists("postings"));
     }

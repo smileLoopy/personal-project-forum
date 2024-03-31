@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forum Page</title>
+</head>
+
+<body>
+
+    <header>
+        Header
+        <hr>
+    </header>
+
+    <main>
+        <form>
+            <label for="search-type" hidden>Type</label>
+            <select id="search-type" name="search-type">
+                <option>Title</option>
+                <option>Content</option>
+                <option>ID</option>
+                <option>Nickname</option>
+                <option>Hashtag</option>
+            </select>
+            <label for="search-value" hidden>Search</label>
+            <input id="search-value" type="search" placeholder="Search..." name="search-value">
+            <button type="submit">Search</button>
+        </form>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Hashtage</th>
+                    <th>CreatedBy</th>
+                    <th>CreatedAt</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>First posting</td>
+                    <td>#java</td>
+                    <td>Eunah</td>
+                    <td>2024-03-30</td>
+                </tr>
+                <tr>
+                    <td>Second posting</td>
+                    <td>#spring</td>
+                    <td>Eunah</td>
+                    <td>2024-03-30</td>
+                </tr>
+                <tr>
+                    <td>Third posting</td>
+                    <td>#java</td>
+                    <td>Eunah</td>
+                    <td>2024-03-30</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <nav>
+            <table>
+                <tr>
+                    <td>previous</td>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>next</td>
+                </tr>
+            </table>
+        </nav>
+    </main>
+
+    <footer>
+        <hr>
+        Footer
+    </footer>
+
+</body>
+</html>

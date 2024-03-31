@@ -34,7 +34,6 @@ class PostingControllerTest {
                 .andExpect(model().attributeExists("postings"));
     }
 
-    @Disabled("Development in progress")
     @DisplayName("[view] [GET] Posting Detail Page - Normal Retrieval Case")
     @Test
     public void givenNothing_whenRequestingPostingView_thenReturnsPostingView() throws Exception {

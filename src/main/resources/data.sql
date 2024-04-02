@@ -1,3 +1,8 @@
+-- test account
+-- TODO: password is exposed. need to think of how to improve it
+insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values
+    ('eunah', 'abcd1234', 'Eunah', 'eunah@mail.com', 'I am Eunah.', now(), 'eunah', now(), 'eunah')
+;
 -- postings 300
 insert into posting (title, content, hashtag, created_by, modified_by, created_at, modified_at) values ('Praesent blandit.', 'In congue. Etiam justo. Etiam pretium iaculis justo.', 'Yellow', 'Kincaid', 'Silva', '2023-12-28 23:33:11', '2024-01-23 01:26:25');
 insert into posting (title, content, hashtag, created_by, modified_by, created_at, modified_at) values ('Nulla mollis molestie lorem.', 'In hac habitasse platea dictumst. Etiam faucibus cursus urna. Ut tellus.', 'Aquamarine', 'Meade', 'Eugine', '2023-11-13 11:42:29', '2024-03-11 21:49:15');

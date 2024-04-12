@@ -18,10 +18,16 @@ public class PostingCommentService {
     private  final PostingCommentRepository postingCommentRepository;
 
     @Transactional(readOnly = true)
-    public List<PostingCommentDto> searchPostingComment(Long postingId) {
+    public List<PostingCommentDto> searchPostingComments(Long postingId) {
         return List.of();
     }
 
     public void savePostingComment(PostingCommentDto dto) {
+    }
+
+    public void updatePostingComment(PostingCommentDto dto) {
+    }
+
+    public void deletePostingComment(Long postingCommentId) {
     }
 }

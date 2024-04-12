@@ -4,6 +4,8 @@ import com.personal.projectforum.domain.Posting;
 import com.personal.projectforum.domain.QPosting;
 import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.StringExpression;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
@@ -15,6 +17,8 @@ public interface PostingRepository extends
         JpaRepository<Posting, Long>,
         QuerydslPredicateExecutor<Posting>,
         QuerydslBinderCustomizer<QPosting> {
+
+    Page<Posting> findByTitle(String title, Pageable pageable);
 
     @Override
     default void customize(QuerydslBindings bindings, QPosting root) {

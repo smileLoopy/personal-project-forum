@@ -4,7 +4,7 @@ insert into user_account (user_id, user_password, nickname, email, memo, created
 ('eunah', 'password', 'Eunah', 'eunah@mail.com', 'I am Eunah.', now(), 'eunah', now(), 'eunah')
 ;
 
--- 123 게시글
+-- 123 postings
 insert into posting (user_account_id, title, content, hashtag, created_by, modified_by, created_at, modified_at) values
 (1, 'Quisque ut erat.', 'Vestibulum quam sapien, varius ut, blandit non, interdum in, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis.
 
@@ -379,7 +379,7 @@ Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus
 Praesent id massa id nisl venenatis lacinia. Aenean sit amet justo. Morbi ut odio.', null, 'Wilmer', 'Ingra', '2021-07-19 14:18:17', '2022-01-23 17:29:54')
 ;
 
--- 1000 댓글
+-- 1000 comments
 insert into posting_comment (posting_id, user_account_id, content, created_at, modified_at, created_by, modified_by) values
 (49, 1, 'Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros.', '2021-03-02 22:40:04', '2021-04-27 15:38:09', 'Lind', 'Orv'),
 (108, 1, 'Quisque id justo sit amet sapien dignissim vestibulum. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Nulla dapibus dolor vel est. Donec odio justo, sollicitudin ut, suscipit a, feugiat et, eros.', '2021-06-08 04:36:02', '2022-01-25 15:35:42', 'Trstram', 'Loy'),

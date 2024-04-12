@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Getter
-@ToString
+@ToString(callSuper = true)
 @Table(indexes = {
         @Index(columnList = "title"),
         @Index(columnList = "hashtag"),
@@ -31,7 +31,7 @@ public class Posting extends AuditingFields{
     @Setter private String hashtag;
 
     @ToString.Exclude
-    @OrderBy("id")
+    @OrderBy("createdAt DESC")
     @OneToMany(mappedBy = "posting", cascade = CascadeType.ALL)
     private final Set<PostingComment> postingComments = new LinkedHashSet<>(); // Set -> No dulication
 

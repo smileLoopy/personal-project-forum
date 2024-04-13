@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * DTO for {@link PostingComment}
  */
-public record PostingWithCommentResponse(
+public record PostingWithCommentsResponse(
         Long id,
         String title,
         String content,
@@ -20,20 +20,20 @@ public record PostingWithCommentResponse(
         LocalDateTime createdAt,
         String email,
         String nickname,
-        Set<PostingCommentResponse> postingCommentResponses
+        Set<PostingCommentResponse> postingCommentsResponse
 ) implements Serializable {
 
-  public static PostingWithCommentResponse of(Long id, String title, String content, String hashtag, LocalDateTime createdAt, String email, String nickname, Set<PostingCommentResponse> postingCommentResponses) {
-    return new PostingWithCommentResponse(id, title, content, hashtag, createdAt, email, nickname, postingCommentResponses);
+  public static PostingWithCommentsResponse of(Long id, String title, String content, String hashtag, LocalDateTime createdAt, String email, String nickname, Set<PostingCommentResponse> postingCommentResponses) {
+    return new PostingWithCommentsResponse(id, title, content, hashtag, createdAt, email, nickname, postingCommentResponses);
   }
 
-  public static PostingWithCommentResponse from(PostingWithCommentsDto dto) {
+  public static PostingWithCommentsResponse from(PostingWithCommentsDto dto) {
     String nickname = dto.userAccountDto().nickname();
     if (nickname == null || nickname.isBlank()) {
       nickname = dto.userAccountDto().userId();
     }
 
-    return new PostingWithCommentResponse(
+    return new PostingWithCommentsResponse(
             dto.id(),
             dto.title(),
             dto.content(),

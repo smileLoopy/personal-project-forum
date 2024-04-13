@@ -1,12 +1,19 @@
 package com.personal.projectforum.controller;
 
+import com.personal.projectforum.domain.type.SearchType;
+import com.personal.projectforum.response.PostingResponse;
+import com.personal.projectforum.response.PostingWithCommentsResponse;
+import com.personal.projectforum.service.PostingService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.RequestParam;
 
 /*
 * /postings
@@ -14,20 +21,28 @@ import java.util.List;
 * /postings/search
 * /postings/search-hashtag
 * */
+@RequiredArgsConstructor
 @RequestMapping("/postings")
 @Controller
 public class PostingController {
 
+    private final PostingService postingService;
+
     @GetMapping
-    public String postings(ModelMap map) {
-        map.addAttribute("postings", List.of());
+    public String postings(
+            @RequestParam(required = false) SearchType searchType,
+            @RequestParam(required = false) String searchValue,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            ModelMap map) {
+        map.addAttribute("postings", postingService.searchPostings(searchType, searchValue, pageable).map(PostingResponse::from));
         return "postings/index";
     }
 
     @GetMapping("/{postingId}")
-    public String posting(@PathVariable long postingId, ModelMap map) {
-        map.addAttribute("posting", "article"); //TODO: Need to insert real data
-        map.addAttribute("postingComments", List.of());
+    public String posting(@PathVariable(name="postingId") long postingId, ModelMap map) {
+        PostingWithCommentsResponse posting = PostingWithCommentsResponse.from(postingService.getPosting(postingId));
+        map.addAttribute("posting",posting);
+        map.addAttribute("postingComments", posting.postingCommentsResponse());
         return "postings/detail";
     }
 }

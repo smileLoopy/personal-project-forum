@@ -55,14 +55,14 @@ class PostingServiceTest {
         SearchType searchType = SearchType.TITLE;
         String searchKeyword = "title";
         Pageable pageable = Pageable.ofSize(20);
-        given(postingRepository.findByTitle(searchKeyword, pageable)).willReturn(Page.empty());
+        given(postingRepository.findByTitleContaining(searchKeyword, pageable)).willReturn(Page.empty());
 
         // When
         Page<PostingDto> postings = sut.searchPostings(searchType, searchKeyword, pageable);
 
         // Then
         assertThat(postings).isEmpty();
-        then(postingRepository).should().findByTitle(searchKeyword, pageable);
+        then(postingRepository).should().findByTitleContaining(searchKeyword, pageable);
     }
 
 
@@ -99,7 +99,7 @@ class PostingServiceTest {
         // Then
         assertThat(t)
                 .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage("NO POSTING - postingId: " + postingId);
+                .hasMessage("Posting not exist - postingId: " + postingId);
         then(postingRepository).should().findById(postingId);
     }
 
@@ -155,7 +155,7 @@ class PostingServiceTest {
     void givenPostingId_whenDeletingPosting_thenDeletesPosting() {
         // Given
         Long postingId = 1L;
-        willDoNothing().given(postingRepository).delete(any(Posting.class));
+        //willDoNothing().given(postingRepository).delete(any(Posting.class));
         // When
         sut.deletePosting(1L);
 

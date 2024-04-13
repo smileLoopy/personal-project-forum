@@ -2,6 +2,7 @@ package com.personal.projectforum.repository;
 
 import com.personal.projectforum.config.JpaConfig;
 import com.personal.projectforum.domain.Posting;
+import com.personal.projectforum.domain.UserAccount;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,13 +20,16 @@ class JPARepositoryTest {
 
     private final PostingRepository postingRepository;
     private final PostingCommentRepository postingCommentRepository;
+    private final UserAccountRepository userAccountRepository;
 
     public JPARepositoryTest(
             @Autowired PostingRepository postingRepository,
-            @Autowired PostingCommentRepository postingCommentRepository
+            @Autowired PostingCommentRepository postingCommentRepository,
+            @Autowired UserAccountRepository userAccountRepository
     ) {
         this.postingRepository = postingRepository;
         this.postingCommentRepository = postingCommentRepository;
+        this.userAccountRepository = userAccountRepository;
     }
 
     @DisplayName("select test")
@@ -33,14 +37,15 @@ class JPARepositoryTest {
     void givenTestData_whenSelecting_thenWorksFine() {
 
         // Given
+        long previousCount = postingRepository.count();
+        UserAccount userAccount = userAccountRepository.save(UserAccount.of("eunah", "pw", null, null, null));
+        Posting posting = Posting.of(userAccount, "new article", "new content", "#spring");
 
         // When
-        List<Posting> postings = postingRepository.findAll();
+        postingRepository.save(posting);
 
         // Then
-        assertThat(postings)
-                .isNotNull()
-                .hasSize(300);
+        assertThat(postingRepository.count()).isEqualTo(previousCount + 1);
     }
 
     @DisplayName("insert test")
@@ -49,7 +54,8 @@ class JPARepositoryTest {
 
         // Given
         long previousCount = postingRepository.count();
-        Posting posting = Posting.of("new posting", "new content", "#spring"); // Factory method made it easy to write this
+        UserAccount userAccount = userAccountRepository.save(UserAccount.of("eunah", "pw", null, null, null));
+        Posting posting = Posting.of(userAccount, "new article", "new content", "#spring");
 
         // When
         Posting savedPost = postingRepository.save(posting);

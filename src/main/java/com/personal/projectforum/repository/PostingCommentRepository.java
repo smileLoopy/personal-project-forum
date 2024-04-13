@@ -10,11 +10,15 @@ import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+import java.util.List;
+
 @RepositoryRestResource
 public interface PostingCommentRepository extends
         JpaRepository<PostingComment, Long>,
         QuerydslPredicateExecutor<PostingComment>,
         QuerydslBinderCustomizer<QPostingComment> {
+
+    List<PostingComment> findByPosting_Id(Long postingId);
 
     @Override
     default void customize(QuerydslBindings bindings, QPostingComment root) {

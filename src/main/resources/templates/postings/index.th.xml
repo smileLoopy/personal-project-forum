@@ -2,4 +2,15 @@
 <thlogic>
     <attr sel="#header" th:replace="header :: header"/>
     <attr sel="#footer" th:replace="footer :: footer"/>
+
+    <attr sel="#posting-table">
+        <attr sel="tbody" th:remove="all-but-first">
+            <attr sel="tr[0]" th:each="posting : ${postings}">
+                <attr sel="td.title/a" th:text="${posting.title}" th:href="@{'/postings/' + ${posting.id}}" />
+                <attr sel="td.hashtag" th:text="${posting.hashtag}" />
+                <attr sel="td.user-id" th:text="${posting.nickname}" />
+                <attr sel="td.created-at/time" th:datetime="${posting.createdAt}" th:text="${#temporals.format(posting.createdAt, 'yyyy-MM-dd')}" />
+            </attr>
+        </attr>
+    </attr>
 </thlogic>

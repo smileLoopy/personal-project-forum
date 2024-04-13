@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 
 @Getter
-@ToString
+@ToString(callSuper = true)
 @Table(indexes = {
         @Index(columnList = "title"),
         @Index(columnList = "hashtag"),
@@ -24,26 +24,28 @@ public class Posting extends AuditingFields{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Setter @ManyToOne(optional = false) private UserAccount userAccount;
     @Setter @Column(nullable = false) private String title;
     @Setter @Column(nullable = false, length = 1000) private String content;
 
     @Setter private String hashtag;
 
     @ToString.Exclude
-    @OrderBy("id")
+    @OrderBy("createdAt DESC")
     @OneToMany(mappedBy = "posting", cascade = CascadeType.ALL)
     private final Set<PostingComment> postingComments = new LinkedHashSet<>(); // Set -> No dulication
 
     protected Posting() {}
     // Hide it with privte and open it with factory method
-    private Posting(String title, String content, String hashtag) {
+    private Posting(UserAccount userAccount, String title, String content, String hashtag) {
+        this.userAccount = userAccount;
         this.title = title;
         this.content = content;
         this.hashtag = hashtag;
     }
     // Factory method
-    public static Posting of(String title, String content, String hashtag) {
-        return new Posting(title, content, hashtag);
+    public static Posting of(UserAccount userAccount, String title, String content, String hashtag) {
+        return new Posting(userAccount,title, content, hashtag);
     }
 
     @Override

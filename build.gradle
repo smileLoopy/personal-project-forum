@@ -61,6 +61,7 @@ def generated = 'src/main/generated'
 // Setting the file directory place of querydsl QClass
 tasks.withType(JavaCompile).configureEach {
     options.getGeneratedSourceOutputDirectory().set(file(generated))
+    options.compilerArgs.add("-parameters")
 }
 
 // Add querydsl QClass to java source set

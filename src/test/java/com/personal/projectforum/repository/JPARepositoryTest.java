@@ -38,7 +38,7 @@ class JPARepositoryTest {
 
         // Given
         long previousCount = postingRepository.count();
-        UserAccount userAccount = userAccountRepository.save(UserAccount.of("eunah", "pw", null, null, null));
+        UserAccount userAccount = userAccountRepository.save(UserAccount.of("newEunah", "pw", null, null, null));
         Posting posting = Posting.of(userAccount, "new article", "new content", "#spring");
 
         // When
@@ -54,7 +54,7 @@ class JPARepositoryTest {
 
         // Given
         long previousCount = postingRepository.count();
-        UserAccount userAccount = userAccountRepository.save(UserAccount.of("eunah", "pw", null, null, null));
+        UserAccount userAccount = userAccountRepository.save(UserAccount.of("newEunah", "pw", null, null, null));
         Posting posting = Posting.of(userAccount, "new article", "new content", "#spring");
 
         // When

@@ -13,4 +13,25 @@
             </attr>
         </attr>
     </attr>
+
+
+    <attr sel="#pagination">
+        <attr sel="li[0]/a"
+              th:text="'previous'"
+              th:href="@{/postings(page=${postings.number - 1})}"
+              th:class="'page-link' + (${postings.number} <= 0 ? ' disabled' : '')"
+        />
+        <attr sel="li[1]" th:class="page-item" th:each="pageNumber : ${paginationBarNumbers}">
+            <attr sel="a"
+                  th:text="${pageNumber + 1}"
+                  th:href="@{/postings(page=${pageNumber})}"
+                  th:class="'page-link' + (${pageNumber} == ${postings.number} ? ' disabled' : '')"
+            />
+        </attr>
+        <attr sel="li[2]/a"
+              th:text="'next'"
+              th:href="@{/postings(page=${postings.number + 1})}"
+              th:class="'page-link' + (${postings.number} >= ${postings.totalPages - 1} ? ' disabled' : '')"
+        />
+    </attr>
 </thlogic>

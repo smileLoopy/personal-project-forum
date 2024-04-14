@@ -163,6 +163,21 @@ class PostingServiceTest {
         then(postingRepository).should().deleteById(postingId);
     }
 
+    @DisplayName("Search posting count, return posting count")
+    @Test
+    void givenNothing_whenCountingPostings_thenReturnsPostingCount() {
+        // Given
+        long expected = 0L;
+        given(postingRepository.count()).willReturn(expected);
+
+        // When
+        long actual = sut.getPostingCount();
+
+        // Then
+        assertThat(actual).isEqualTo(expected);
+        then(postingRepository).should().count();
+    }
+
     private UserAccount createUserAccount() {
         return UserAccount.of(
                 "eunah",

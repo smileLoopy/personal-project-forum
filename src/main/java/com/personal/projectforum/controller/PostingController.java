@@ -43,6 +43,7 @@ public class PostingController {
         List<Integer> barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), postings.getTotalPages());
         map.addAttribute("postings", postings);
         map.addAttribute("paginationBarNumbers", barNumbers);
+        map.addAttribute("searchTypes", SearchType.values());
         return "postings/index";
     }
 

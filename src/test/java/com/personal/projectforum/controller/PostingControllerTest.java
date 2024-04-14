@@ -1,6 +1,7 @@
 package com.personal.projectforum.controller;
 
 import com.personal.projectforum.config.SecurityConfig;
+import com.personal.projectforum.domain.type.SearchType;
 import com.personal.projectforum.dto.PostingWithCommentsDto;
 import com.personal.projectforum.dto.UserAccountDto;
 import com.personal.projectforum.service.PaginationService;
@@ -63,9 +64,33 @@ class PostingControllerTest {
         then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
     }
 
+    @DisplayName("[view] [GET] Posting List (Forum) Page - Retrieval with search keyword")
+    @Test
+    public void givenSearchKeyword_whenSearchingPostingsView_thenReturnsPostingsView() throws Exception {
+        // Given
+        SearchType searchType = SearchType.TITLE;
+        String searchValue = "title";
+
+        given(postingService.searchPostings(eq(searchType), eq(searchValue), any(Pageable.class))).willReturn(Page.empty());
+        given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(0, 1, 2, 3, 4));
+
+        // When & Then
+        mvc.perform(get("/postings")
+                        .queryParam("searchType", searchType.name())
+                        .queryParam("searchValue", searchValue)
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("postings/index"))
+                .andExpect(model().attributeExists("postings"))
+                .andExpect(model().attributeExists("searchTypes"));
+        then(postingService).should().searchPostings(eq(searchType), eq(searchValue), any(Pageable.class));
+        then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
+    }
+
     @DisplayName("[view][GET] posting list (forum) page - paging, sorting function")
     @Test
-    void givenPagingAndSortingParams_whenSearchingPostingsPage_thenReturnsPostingsPage() throws Exception {
+    void givenPagingAndSortingParams_whenSearchingPostingsPage_thenReturnsPostingsView() throws Exception {
         // Given
         String sortName = "title";
         String direction = "desc";

@@ -51,6 +51,7 @@ public class PostingController {
         PostingWithCommentsResponse posting = PostingWithCommentsResponse.from(postingService.getPosting(postingId));
         map.addAttribute("posting",posting);
         map.addAttribute("postingComments", posting.postingCommentsResponse());
+        map.addAttribute("totalCount", postingService.getPostingCount());
         return "postings/detail";
     }
 }

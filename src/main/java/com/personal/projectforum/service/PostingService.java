@@ -62,4 +62,8 @@ public class PostingService {
     public void deletePosting(long postingId) {
         postingRepository.deleteById(postingId);
     }
+
+    public long getPostingCount() {
+        return postingRepository.count();
+    }
 }

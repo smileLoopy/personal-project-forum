@@ -97,7 +97,9 @@ class PostingControllerTest {
     public void givenNothing_whenRequestingPostingView_thenReturnsPostingView() throws Exception {
         // Given
         Long postingId = 1L;
+        long totalCount = 1L;
         given(postingService.getPosting(postingId)).willReturn(createPostingWithCommentsDto());
+        given(postingService.getPostingCount()).willReturn(totalCount);
 
         // When & Then
         mvc.perform(get("/postings/" + postingId))
@@ -105,8 +107,11 @@ class PostingControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("postings/detail"))
                 .andExpect(model().attributeExists("posting"))
-                .andExpect(model().attributeExists("postingComments"));
+                .andExpect(model().attributeExists("postingComments"))
+                .andExpect(model().attributeExists("postingComments"))
+                .andExpect(model().attribute("totalCount", totalCount));
         then(postingService).should().getPosting(postingId);
+        then(postingService).should().getPostingCount();
     }
 
     @Disabled("Development in progress")

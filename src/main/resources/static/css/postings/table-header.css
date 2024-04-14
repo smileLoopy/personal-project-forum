@@ -1,0 +1,5 @@
+/* posting table title */
+#posting-table > thead a {
+    text-decoration: none;
+    color: black;
+}

@@ -21,7 +21,7 @@ public record PostingWithCommentsResponse(
         String email,
         String nickname,
         Set<PostingCommentResponse> postingCommentsResponse
-) implements Serializable {
+) {
 
   public static PostingWithCommentsResponse of(Long id, String title, String content, String hashtag, LocalDateTime createdAt, String email, String nickname, Set<PostingCommentResponse> postingCommentResponses) {
     return new PostingWithCommentsResponse(id, title, content, hashtag, createdAt, email, nickname, postingCommentResponses);

@@ -17,7 +17,7 @@ public record PostingCommentResponse(
         LocalDateTime createdAt,
         String email,
         String nickname
-) implements Serializable {
+) {
 
   public static PostingCommentResponse of(Long id, String content, LocalDateTime createdAt, String email, String nickname) {
     return new PostingCommentResponse(id, content, createdAt, email, nickname);

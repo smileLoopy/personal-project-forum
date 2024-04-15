@@ -20,7 +20,7 @@ public class PostingComment extends AuditingFields{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Setter @ManyToOne(optional = false) private UserAccount userAccount;
+    @Setter @ManyToOne(optional = false) @JoinColumn(name = "userId") private UserAccount userAccount;
     @Setter @ManyToOne(optional = false) private Posting posting;
     @Setter @Column(nullable = false, length = 500) private String content;
 

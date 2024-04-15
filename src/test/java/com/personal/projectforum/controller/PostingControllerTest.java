@@ -216,7 +216,7 @@ class PostingControllerTest {
     }
 
     private UserAccountDto createUserAccountDto() {
-        return UserAccountDto.of(1L,
+        return UserAccountDto.of(
                 "eunah",
                 "pw",
                 "eunah@mail.com",

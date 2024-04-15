@@ -18,7 +18,7 @@ public record PostingResponse(
         LocalDateTime createdAt,
         String email,
         String nickname
-) implements Serializable {
+) {
 
   public static PostingResponse of(Long id, String title, String content, String hashtag, LocalDateTime createdAt, String email, String nickname) {
     return new PostingResponse(id, title, content, hashtag, createdAt, email, nickname);

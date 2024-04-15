@@ -259,7 +259,6 @@ class PostingServiceTest {
 
     private UserAccountDto createUserAccountDto() {
         return UserAccountDto.of(
-                1L,
                 "eunah",
                 "password",
                 "eunah@mail.com",

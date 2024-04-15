@@ -11,6 +11,12 @@
         <attr sel="#hashtag" th:text="*{hashtag}" />
         <attr sel="#posting-content/pre" th:text="*{content}" />
 
+        <attr sel="#posting-buttons">
+            <attr sel="#delete-posting-form" th:action="'/postings/' + *{id} + '/delete'" th:method="post">
+                <attr sel="#update-posting" th:href="'/postings/' + *{id} + '/form'" />
+            </attr>
+        </attr>
+
         <attr sel="#posting-comments" th:remove="all-but-first">
             <attr sel="li[0]" th:each="postingComment : ${postingComments}">
                 <attr sel="div/strong" th:text="${postingComment.nickname}" />

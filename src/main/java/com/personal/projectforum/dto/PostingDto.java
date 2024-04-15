@@ -1,6 +1,7 @@
 package com.personal.projectforum.dto;
 
 import com.personal.projectforum.domain.Posting;
+import com.personal.projectforum.domain.UserAccount;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -20,6 +21,10 @@ public record PostingDto(
         String modifiedBy
 ) {
 
+  public static PostingDto of(UserAccountDto userAccountDto, String title, String content, String hashtag) {
+    return new PostingDto(null, userAccountDto, title, content, hashtag, null, null, null, null);
+  }
+
   public static PostingDto of(Long id, UserAccountDto userAccountDto, String title, String content, String hashtag, LocalDateTime createdAt, String createdBy, LocalDateTime modifiedAt, String modifiedBy) {
     return new PostingDto(id, userAccountDto, title, content, hashtag, createdAt, createdBy, modifiedAt, modifiedBy);
   }
@@ -38,9 +43,9 @@ public record PostingDto(
     );
   }
 
-  public Posting toEntity() {
+  public Posting toEntity(UserAccount userAccount) {
     return Posting.of(
-            userAccountDto.toEntity(),
+            userAccount,
             title,
             content,
             hashtag

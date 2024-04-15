@@ -1,10 +1,12 @@
 package com.personal.projectforum.service;
 
 import com.personal.projectforum.domain.Posting;
-import com.personal.projectforum.domain.type.SearchType;
+import com.personal.projectforum.domain.UserAccount;
+import com.personal.projectforum.domain.constant.SearchType;
 import com.personal.projectforum.dto.PostingDto;
 import com.personal.projectforum.dto.PostingWithCommentsDto;
 import com.personal.projectforum.repository.PostingRepository;
+import com.personal.projectforum.repository.UserAccountRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +24,7 @@ import java.util.List;
 public class PostingService {
 
     private final PostingRepository postingRepository;
+    private final UserAccountRepository userAccountRepository;
 
     @Transactional(readOnly = true)
     public Page<PostingDto> searchPostings(SearchType searchType, String searchKeyword, Pageable pageable) {
@@ -40,19 +43,27 @@ public class PostingService {
     }
 
     @Transactional(readOnly = true)
-    public PostingWithCommentsDto getPosting(Long postingId) {
+    public PostingWithCommentsDto getPostingWithComments(Long postingId) {
         return postingRepository.findById(postingId)
                 .map(PostingWithCommentsDto::from)
                 .orElseThrow(() -> new EntityNotFoundException("Posting not exist - postingId: " + postingId));
     }
 
-    public void savePosting(PostingDto dto) {
-        postingRepository.save(dto.toEntity());
+    @Transactional(readOnly = true)
+    public PostingDto getPosting(Long postingId) {
+        return postingRepository.findById(postingId)
+                .map(PostingDto::from)
+                .orElseThrow(() -> new EntityNotFoundException("No posting - postingId: " + postingId));
     }
 
-    public void updatePosting(PostingDto dto) {
+    public void savePosting(PostingDto dto) {
+        UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
+        postingRepository.save(dto.toEntity(userAccount));
+    }
+
+    public void updatePosting(Long postingId, PostingDto dto) {
         try {
-            Posting posting = postingRepository.getReferenceById(dto.id());
+            Posting posting = postingRepository.getReferenceById(postingId);
             if(dto.title() != null) { posting.setTitle(dto.title()); }
             if(dto.content() != null) { posting.setContent(dto.content()); }
             posting.setHashtag(dto.hashtag());

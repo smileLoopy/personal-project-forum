@@ -1,16 +1,19 @@
 package com.personal.projectforum.controller;
 
 import com.personal.projectforum.config.SecurityConfig;
-import com.personal.projectforum.domain.type.SearchType;
+import com.personal.projectforum.domain.constant.FormStatus;
+import com.personal.projectforum.domain.constant.SearchType;
+import com.personal.projectforum.dto.PostingDto;
 import com.personal.projectforum.dto.PostingWithCommentsDto;
 import com.personal.projectforum.dto.UserAccountDto;
+import com.personal.projectforum.dto.request.PostingRequest;
+import com.personal.projectforum.response.PostingResponse;
 import com.personal.projectforum.service.PaginationService;
 import com.personal.projectforum.service.PostingService;
+import com.personal.projectforum.util.FormDataEncoder;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentMatchers;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -27,23 +30,30 @@ import java.util.List;
 import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
+import static org.mockito.BDDMockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, FormDataEncoder.class})
 @DisplayName("View Controller - Posting")
 @WebMvcTest(PostingController.class)
 class PostingControllerTest {
 
     private final MockMvc mvc;
+    private final FormDataEncoder formDataEncoder;
 
     @MockBean private PostingService postingService;
     @MockBean private PaginationService paginationService;
 
-    public PostingControllerTest(@Autowired MockMvc mvc) {
+    public PostingControllerTest(
+            @Autowired MockMvc mvc,
+            @Autowired FormDataEncoder formDataEncoder
+    ) {
         this.mvc = mvc;
+        this.formDataEncoder = formDataEncoder;
     }
 
     @DisplayName("[view] [GET] Posting List (Forum) Page - Normal Retrieval Case")
@@ -123,7 +133,7 @@ class PostingControllerTest {
         // Given
         Long postingId = 1L;
         long totalCount = 1L;
-        given(postingService.getPosting(postingId)).willReturn(createPostingWithCommentsDto());
+        given(postingService.getPostingWithComments(postingId)).willReturn(createPostingWithCommentsDto());
         given(postingService.getPostingCount()).willReturn(totalCount);
 
         // When & Then
@@ -135,7 +145,7 @@ class PostingControllerTest {
                 .andExpect(model().attributeExists("postingComments"))
                 .andExpect(model().attributeExists("postingComments"))
                 .andExpect(model().attribute("totalCount", totalCount));
-        then(postingService).should().getPosting(postingId);
+        then(postingService).should().getPostingWithComments(postingId);
         then(postingService).should().getPostingCount();
     }
 
@@ -197,6 +207,108 @@ class PostingControllerTest {
         then(postingService).should().searchPostingsViaHashtag(eq(hashtag), any(Pageable.class));
         then(postingService).should().getHashtags();
         then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
+    }
+
+
+    @DisplayName("[view][GET] Writing new posting page")
+    @Test
+    void givenNothing_whenRequesting_thenReturnsNewPostingPage() throws Exception {
+        // Given
+
+        // When & Then
+        mvc.perform(get("/postings/form"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("postings/form"))
+                .andExpect(model().attribute("formStatus", FormStatus.CREATE));
+    }
+
+    @DisplayName("[view][POST] Saving new posting - Normal Retrieval")
+    @Test
+    void givenNewPostingInfo_whenRequesting_thenSavesNewPosting() throws Exception {
+        // Given
+        PostingRequest postingRequest = PostingRequest.of("new title", "new content", "#new");
+        willDoNothing().given(postingService).savePosting(any(PostingDto.class));
+
+        // When & Then
+        mvc.perform(
+                        post("/postings/form")
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .content(formDataEncoder.encode(postingRequest))
+                                .with(csrf())
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/postings"))
+                .andExpect(redirectedUrl("/postings"));
+        then(postingService).should().savePosting(any(PostingDto.class));
+    }
+
+    @DisplayName("[view][GET] Update posting page")
+    @Test
+    void givenNothing_whenRequesting_thenReturnsUpdatedPostingPage() throws Exception {
+        // Given
+        long postingId = 1L;
+        PostingDto dto = createPostingDto();
+        given(postingService.getPosting(postingId)).willReturn(dto);
+
+        // When & Then
+        mvc.perform(get("/postings/" + postingId + "/form"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("postings/form"))
+                .andExpect(model().attribute("posting", PostingResponse.from(dto)))
+                .andExpect(model().attribute("formStatus", FormStatus.UPDATE));
+        then(postingService).should().getPosting(postingId);
+    }
+
+    @DisplayName("[view][POST] Update posting - Normal Retrieval")
+    @Test
+    void givenUpdatedPostingInfo_whenRequesting_thenUpdatesNewPosting() throws Exception {
+        // Given
+        long postingId = 1L;
+        PostingRequest postingRequest = PostingRequest.of("new title", "new content", "#new");
+        willDoNothing().given(postingService).updatePosting(eq(postingId), any(PostingDto.class));
+
+        // When & Then
+        mvc.perform(
+                        post("/postings/" + postingId + "/form")
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .content(formDataEncoder.encode(postingRequest))
+                                .with(csrf())
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/postings/" + postingId))
+                .andExpect(redirectedUrl("/postings/" + postingId));
+        then(postingService).should().updatePosting(eq(postingId), any(PostingDto.class));
+    }
+
+    @DisplayName("[view][POST] Delete posting - Normal Retrieval")
+    @Test
+    void givenPostingIdToDelete_whenRequesting_thenDeletesPosting() throws Exception {
+        // Given
+        long postingId = 1L;
+        willDoNothing().given(postingService).deletePosting(postingId);
+
+        // When & Then
+        mvc.perform(
+                        post("/postings/" + postingId + "/delete")
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .with(csrf())
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/postings"))
+                .andExpect(redirectedUrl("/postings"));
+        then(postingService).should().deletePosting(postingId);
+    }
+
+
+    private PostingDto createPostingDto() {
+        return PostingDto.of(
+                createUserAccountDto(),
+                "title",
+                "content",
+                "#java"
+        );
     }
 
 

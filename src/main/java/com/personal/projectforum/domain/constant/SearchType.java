@@ -1,4 +1,4 @@
-package com.personal.projectforum.domain.type;
+package com.personal.projectforum.domain.constant;
 
 import lombok.Getter;
 

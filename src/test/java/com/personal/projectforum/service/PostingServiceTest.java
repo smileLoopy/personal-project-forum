@@ -2,11 +2,12 @@ package com.personal.projectforum.service;
 
 import com.personal.projectforum.domain.Posting;
 import com.personal.projectforum.domain.UserAccount;
-import com.personal.projectforum.domain.type.SearchType;
+import com.personal.projectforum.domain.constant.SearchType;
 import com.personal.projectforum.dto.PostingDto;
 import com.personal.projectforum.dto.PostingWithCommentsDto;
 import com.personal.projectforum.dto.UserAccountDto;
 import com.personal.projectforum.repository.PostingRepository;
+import com.personal.projectforum.repository.UserAccountRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +35,7 @@ class PostingServiceTest {
     @InjectMocks private PostingService sut;
 
     @Mock private PostingRepository postingRepository;
+    @Mock private UserAccountRepository userAccountRepository;
 
     @DisplayName("Searching posting without search keyword, return posting page")
     @Test
@@ -95,6 +98,44 @@ class PostingServiceTest {
         then(postingRepository).should().findByHashtag(hashtag, pageable);
     }
 
+
+    @DisplayName("Searching with postingId, return comments on the posting.")
+    @Test
+    void givenPostingId_whenSearchingPostingWithComments_thenReturnsPostingWithComments() {
+        // Given
+        Long postingId = 1L;
+        Posting posting = createPosting();
+        given(postingRepository.findById(postingId)).willReturn(Optional.of(posting));
+
+        // When
+        PostingWithCommentsDto dto = sut.getPostingWithComments(postingId);
+
+        // Then
+        assertThat(dto)
+                .hasFieldOrPropertyWithValue("title", posting.getTitle())
+                .hasFieldOrPropertyWithValue("content", posting.getContent())
+                .hasFieldOrPropertyWithValue("hashtag", posting.getHashtag());
+        then(postingRepository).should().findById(postingId);
+    }
+
+    @DisplayName("If there is no comment on the posting, return exception.")
+    @Test
+    void givenNonexistentPostingId_whenSearchingPostingWithComments_thenThrowsException() {
+        // Given
+        Long postingId = 0L;
+        given(postingRepository.findById(postingId)).willReturn(Optional.empty());
+
+        // When
+        Throwable t = catchThrowable(() -> sut.getPostingWithComments(postingId));
+
+        // Then
+        assertThat(t)
+                .isInstanceOf(EntityNotFoundException.class)
+                .hasMessage("No posting exist - postingId: " + postingId);
+        then(postingRepository).should().findById(postingId);
+    }
+
+
     @DisplayName("Searching posting, return posting")
     @Test
     void givenPostingId_whenSearchingPosting_thenReturnsPosting() {
@@ -104,7 +145,7 @@ class PostingServiceTest {
         given(postingRepository.findById(postingId)).willReturn(Optional.of(posting));
 
         // When
-        PostingWithCommentsDto dto = sut.getPosting(postingId);
+        PostingDto dto = sut.getPosting(postingId);
 
         // Then
         assertThat(dto)
@@ -115,7 +156,7 @@ class PostingServiceTest {
 
     }
 
-    @DisplayName("Search nonexistent Posting, return exception.")
+    @DisplayName("If the posting is not exist, throw exception.")
     @Test
     void givenNonexistentPostingId_whenSearchingPosting_thenThrowsException() {
         // Given
@@ -137,12 +178,14 @@ class PostingServiceTest {
     void givenPostingInfo_whenSavingPosting_thenSavesPosting() {
         // Given
         PostingDto dto = createPostingDto();
+        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(createUserAccount());
         given(postingRepository.save(any(Posting.class))).willReturn(createPosting());
 
         // When
         sut.savePosting(dto);
 
         // Then
+        then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
         then(postingRepository).should().save(any(Posting.class));
     }
 
@@ -155,7 +198,7 @@ class PostingServiceTest {
         given(postingRepository.getReferenceById(dto.id())).willReturn(posting);
 
         // When
-        sut.updatePosting(dto);
+        sut.updatePosting(dto.id(), dto);
 
         // Then
         assertThat(posting)
@@ -173,7 +216,7 @@ class PostingServiceTest {
         given(postingRepository.getReferenceById(dto.id())).willThrow(EntityNotFoundException.class);
 
         // When
-        sut.updatePosting(dto);
+        sut.updatePosting(dto.id(), dto);
 
         // Then
         then(postingRepository).should().getReferenceById(dto.id());
@@ -233,12 +276,15 @@ class PostingServiceTest {
     }
 
     private Posting createPosting() {
-        return Posting.of(
+        Posting posting = Posting.of(
                 createUserAccount(),
                 "title",
                 "content",
                 "#java"
         );
+        ReflectionTestUtils.setField(posting, "id", 1L);
+
+        return posting;
     }
 
     private PostingDto createPostingDto() {
@@ -246,7 +292,8 @@ class PostingServiceTest {
     }
 
     private PostingDto createPostingDto(String title, String content, String hashtag) {
-        return PostingDto.of(1L,
+        return PostingDto.of(
+                1L,
                 createUserAccountDto(),
                 title,
                 content,

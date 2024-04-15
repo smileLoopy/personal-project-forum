@@ -1,7 +1,10 @@
 package com.personal.projectforum.controller;
 
-import com.personal.projectforum.domain.type.SearchType;
+import com.personal.projectforum.domain.constant.FormStatus;
+import com.personal.projectforum.domain.constant.SearchType;
+import com.personal.projectforum.dto.UserAccountDto;
 import com.personal.projectforum.response.PostingResponse;
+import com.personal.projectforum.dto.request.PostingRequest;
 import com.personal.projectforum.response.PostingWithCommentsResponse;
 import com.personal.projectforum.service.PaginationService;
 import com.personal.projectforum.service.PostingService;
@@ -12,10 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -49,7 +49,7 @@ public class PostingController {
 
     @GetMapping("/{postingId}")
     public String posting(@PathVariable(name="postingId") long postingId, ModelMap map) {
-        PostingWithCommentsResponse posting = PostingWithCommentsResponse.from(postingService.getPosting(postingId));
+        PostingWithCommentsResponse posting = PostingWithCommentsResponse.from(postingService.getPostingWithComments(postingId));
         map.addAttribute("posting",posting);
         map.addAttribute("postingComments", posting.postingCommentsResponse());
         map.addAttribute("totalCount", postingService.getPostingCount());
@@ -57,7 +57,7 @@ public class PostingController {
     }
 
     @GetMapping("/search-hashtag")
-    public String searchHashtag(
+    public String searchPostingHashtag(
             @RequestParam(required = false) String searchValue,
             @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             ModelMap map
@@ -71,5 +71,49 @@ public class PostingController {
         map.addAttribute("paginationBarNumbers", barNumbers);
         map.addAttribute("searchType", SearchType.HASHTAG);
         return "postings/search-hashtag";
+    }
+    @GetMapping("/form")
+    public String postingForm(ModelMap map) {
+        map.addAttribute("formStatus", FormStatus.CREATE);
+
+        return "postings/form";
+    }
+
+    @PostMapping("/form")
+    public String postNewPosting(PostingRequest postingRequest) {
+        // TODO: Need to insert authentication info.
+        postingService.savePosting(postingRequest.toDto(UserAccountDto.of(
+                "eunah", "passward", "eunah@mail.com", "Eunah", "memo"
+        )));
+
+        return "redirect:/postings";
+    }
+
+    @GetMapping("/{postingId}/form")
+    public String updatePostingForm(@PathVariable Long postingId, ModelMap map) {
+        PostingResponse posting = PostingResponse.from(postingService.getPosting(postingId));
+
+        map.addAttribute("posting", posting);
+        map.addAttribute("formStatus", FormStatus.UPDATE);
+
+        return "postings/form";
+    }
+
+    @PostMapping ("/{postingId}/form")
+    public String updatePosting(@PathVariable Long postingId, PostingRequest postingRequest) {
+        // TODO: Need to insert authentication info
+        postingService.updatePosting(postingId, postingRequest.toDto(UserAccountDto.of(
+                "eunah", "passward", "eunah@mail.com", "Eunah", "memo", null, null, null, null
+        )));
+
+        return "redirect:/postings/" + postingId;
+    }
+
+    @PostMapping ("/{postingId}/delete")
+    public String deletePosting(@PathVariable Long postingId) {
+        // TODO: eed to insert authentication info
+        postingService.deletePosting(postingId);
+
+        return "redirect:/postings";
     }
 }

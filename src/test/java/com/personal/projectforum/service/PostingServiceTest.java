@@ -18,6 +18,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,6 +66,34 @@ class PostingServiceTest {
         then(postingRepository).should().findByTitleContaining(searchKeyword, pageable);
     }
 
+    @DisplayName("Searching posting via hashtag without any search keyword, return empty page.")
+    @Test
+    void givenNoSearchParameters_whenSearchingPostingsViaHashtag_thenReturnsEmptyPage() {
+        // Given
+        Pageable pageable = Pageable.ofSize(20);
+
+        // When
+        Page<PostingDto> postings = sut.searchPostingsViaHashtag(null, pageable);
+
+        // Then
+        assertThat(postings).isEqualTo(Page.empty(pageable));
+        then(postingRepository).shouldHaveNoInteractions();
+    }
+
+    @DisplayName("Searching posting via hashtag, return postings page.")
+    @Test
+    void givenHashtag_whenSearchingPostingsViaHashtag_thenReturnsPostingsPage() {
+        // Given
+        String hashtag = "#java";
+        Pageable pageable = Pageable.ofSize(20);
+        given(postingRepository.findByHashtag(hashtag, pageable)).willReturn(Page.empty(pageable));
+        // When
+        Page<PostingDto> postings = sut.searchPostingsViaHashtag(hashtag, pageable);
+
+        // Then
+        assertThat(postings).isEqualTo(Page.empty(pageable));
+        then(postingRepository).should().findByHashtag(hashtag, pageable);
+    }
 
     @DisplayName("Searching posting, return posting")
     @Test
@@ -176,6 +205,21 @@ class PostingServiceTest {
         // Then
         assertThat(actual).isEqualTo(expected);
         then(postingRepository).should().count();
+    }
+
+    @DisplayName("Search hashtag, return unique list of hashtags")
+    @Test
+    void givenNothing_whenCalling_thenReturnsHashtags() {
+        // Given
+        List<String> expectedHashtags = List.of("#java", "#spring", "#boot");
+        given(postingRepository.findAllDistinctHashtags()).willReturn(expectedHashtags);
+
+        // When
+        List<String> actualHashtags = sut.getHashtags();
+
+        // Then
+        assertThat(actualHashtags).isEqualTo(expectedHashtags);
+        then(postingRepository).should().findAllDistinctHashtags();
     }
 
     private UserAccount createUserAccount() {

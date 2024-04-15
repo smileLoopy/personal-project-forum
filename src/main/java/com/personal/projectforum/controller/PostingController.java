@@ -55,4 +55,21 @@ public class PostingController {
         map.addAttribute("totalCount", postingService.getPostingCount());
         return "postings/detail";
     }
+
+    @GetMapping("/search-hashtag")
+    public String searchHashtag(
+            @RequestParam(required = false) String searchValue,
+            @PageableDefault(size = 10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            ModelMap map
+    ) {
+
+        Page<PostingResponse> postings = postingService.searchPostingsViaHashtag(searchValue, pageable).map(PostingResponse::from);
+        List<Integer> barNumbers = paginationService.getPaginationBarNumbers(pageable.getPageNumber(), postings.getTotalPages());
+        List<String> hashtag = postingService.getHashtags();
+        map.addAttribute("postings", postings);
+        map.addAttribute("hashtags", hashtag);
+        map.addAttribute("paginationBarNumbers", barNumbers);
+        map.addAttribute("searchType", SearchType.HASHTAG);
+        return "postings/search-hashtag";
+    }
 }

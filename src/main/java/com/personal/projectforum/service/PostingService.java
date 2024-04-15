@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Slf4j
 @RequiredArgsConstructor
 @Transactional
@@ -65,5 +67,18 @@ public class PostingService {
 
     public long getPostingCount() {
         return postingRepository.count();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostingDto> searchPostingsViaHashtag(String hashtag, Pageable pageable) {
+        if(hashtag == null || hashtag.isBlank()) {
+            return Page.empty(pageable);
+        }
+
+        return postingRepository.findByHashtag(hashtag, pageable).map(PostingDto::from);
+    }
+
+    public List<String> getHashtags() {
+        return postingRepository.findAllDistinctHashtags();
     }
 }

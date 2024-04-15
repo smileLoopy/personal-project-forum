@@ -152,18 +152,53 @@ class PostingControllerTest {
                 .andExpect(view().name("postings/search"));
     }
 
-    @Disabled("Development in progress")
     @DisplayName("[view] [GET] Posting Search Hashtag Page - Normal Retrieval Case")
     @Test
-    public void givenNothing_whenRequestingPostingHashtagSearchView_thenReturnsPostingHashtagSearchView() throws Exception {
+    public void givenNothing_whenRequestingPostingSearchHashtagView_thenReturnsPostingSearchHashtagView() throws Exception {
         // Given
-
+        List<String> hashtags = List.of("#java", "#spring", "#boot");
+        given(postingService.searchPostingsViaHashtag(eq(null), any(Pageable.class))).willReturn(Page.empty());
+        given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(1, 2, 3, 4, 5));
+        given(postingService.getHashtags()).willReturn(hashtags);
         // When & Then
         mvc.perform(get("/postings/search-hashtag"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
-                .andExpect(view().name("postings/search-hashtag"));
+                .andExpect(view().name("postings/search-hashtag"))
+                .andExpect(model().attribute("postings", Page.empty()))
+                .andExpect(model().attribute("hashtags", hashtags))
+                .andExpect(model().attributeExists("paginationBarNumbers"))
+                .andExpect(model().attribute("searchType", SearchType.HASHTAG));
+        then(postingService).should().searchPostingsViaHashtag(eq(null), any(Pageable.class));
+        then(postingService).should().getHashtags();
+        then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
     }
+
+    @DisplayName("[view] [GET] Posting Search Hashtag Page - Normal Retrieval Case, Input hashtag")
+    @Test
+    public void givenHashtag_whenRequestingPostingSearchHashtagView_thenReturnsPostingSearchHashtagView() throws Exception {
+        // Given
+        String hashtag = "#java";
+        List<String> hashtags = List.of("#java", "#spring", "#boot");
+        given(postingService.searchPostingsViaHashtag(eq(hashtag), any(Pageable.class))).willReturn(Page.empty());
+        given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(1, 2, 3, 4, 5));
+        given(postingService.getHashtags()).willReturn(hashtags);
+        // When & Then
+        mvc.perform(get("/postings/search-hashtag")
+                        .queryParam("searchValue", hashtag)
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
+                .andExpect(view().name("postings/search-hashtag"))
+                .andExpect(model().attribute("postings", Page.empty()))
+                .andExpect(model().attributeExists("hashtags"))
+                .andExpect(model().attributeExists("paginationBarNumbers"))
+                .andExpect(model().attribute("searchType", SearchType.HASHTAG));
+        then(postingService).should().searchPostingsViaHashtag(eq(hashtag), any(Pageable.class));
+        then(postingService).should().getHashtags();
+        then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
+    }
+
 
     private PostingWithCommentsDto createPostingWithCommentsDto() {
         return PostingWithCommentsDto.of(

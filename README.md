@@ -33,5 +33,5 @@ Etc
 
 ## Reference
 
-* Use Case Diagram: [#4} (https://github.com/smileLoopy/personal-project-forum/issues/4), https://viewer.diagrams.net/#Uhttps%3A%2F%2Fraw.githubusercontent.com%2Fdjkeh%2Ffastcampus-project-board%2Fmain%2Fdocument%2Fuse-case.svg
+* Use Case Diagram: [#4} (https://github.com/smileLoopy/personal-project-forum/issues/4), https://app.diagrams.net/#HsmileLoopy%2Fpersonal-project-forum%2Fmain%2Fdocument%2Fuse-case.svg#%7B%22pageId%22%3A%22cm7EwO-i7CsIZ_i3STuf%22%7D
 * API Endpoint Google Spreadsheets: [#1] (https://github.com/smileLoopy/personal-project-forum/issues/1), https://docs.google.com/spreadsheets/d/1S2FW7_LlePGF95strSYFJEsEQKoyZ9nGHWM8wZgFmSU/edit?usp=sharing

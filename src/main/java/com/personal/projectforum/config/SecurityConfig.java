@@ -34,7 +34,7 @@ public class SecurityConfig {
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(withDefaults())
+                //.httpBasic(withDefaults())
                 .formLogin(Customizer.withDefaults())
                 .logout(Customizer.withDefaults())
                 .logout(logout -> logout.logoutSuccessUrl("/"));

@@ -55,6 +55,7 @@ public class PostingController {
         map.addAttribute("posting",posting);
         map.addAttribute("postingComments", posting.postingCommentsResponse());
         map.addAttribute("totalCount", postingService.getPostingCount());
+        map.addAttribute("searchTypeHashtag", SearchType.HASHTAG);
         return "postings/detail";
     }
 

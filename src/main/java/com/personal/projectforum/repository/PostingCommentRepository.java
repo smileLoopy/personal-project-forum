@@ -19,6 +19,7 @@ public interface PostingCommentRepository extends
         QuerydslBinderCustomizer<QPostingComment> {
 
     List<PostingComment> findByPosting_Id(Long postingId);
+    void deleteByIdAndUserAccount_UserId(Long postingCommentId, String userId);
 
     @Override
     default void customize(QuerydslBindings bindings, QPostingComment root) {

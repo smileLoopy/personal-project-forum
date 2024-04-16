@@ -26,6 +26,8 @@ public interface PostingRepository extends
     Page<Posting> findByUserAccount_NicknameContaining(String nickname, Pageable pageable);
     Page<Posting> findByHashtag(String hashtag, Pageable pageable);
 
+    void deleteByIdAndUserAccount_UserId(Long postingId, String userId);
+
     @Override
     default void customize(QuerydslBindings bindings, QPosting root) {
         bindings.excludeUnlistedProperties(true);

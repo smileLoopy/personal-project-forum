@@ -40,7 +40,7 @@ public class PostingCommentService {
             UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
             postingCommentRepository.save(dto.toEntity(posting, userAccount));
         } catch (EntityNotFoundException e) {
-            log.warn("Failed to save comment. Can not info for creating comment - : {}", e.getLocalizedMessage());
+            log.warn("Failed to save comment. Can not find info for creating comment - : {}", e.getLocalizedMessage());
         }
     }
 
@@ -53,7 +53,7 @@ public class PostingCommentService {
         }
     }
 
-    public void deletePostingComment(Long postingCommentId) {
-        postingCommentRepository.deleteById(postingCommentId);
+    public void deletePostingComment(Long postingCommentId, String userId) {
+        postingCommentRepository.deleteByIdAndUserAccount_UserId(postingCommentId, userId);
     }
 }

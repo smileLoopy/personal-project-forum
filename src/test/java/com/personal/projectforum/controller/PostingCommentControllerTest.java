@@ -1,6 +1,7 @@
 package com.personal.projectforum.controller;
 
 import com.personal.projectforum.config.SecurityConfig;
+import com.personal.projectforum.config.TestSecurityConfig;
 import com.personal.projectforum.dto.PostingCommentDto;
 import com.personal.projectforum.dto.request.PostingCommentRequest;
 import com.personal.projectforum.service.PostingCommentService;
@@ -12,6 +13,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.TestExecutionEvent;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
@@ -24,7 +27,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@Import({SecurityConfig.class, FormDataEncoder.class})
+@Import({TestSecurityConfig.class, FormDataEncoder.class})
 @DisplayName("View Controller - Comment")
 @WebMvcTest(PostingCommentController.class)
 class PostingCommentControllerTest {
@@ -42,6 +45,7 @@ class PostingCommentControllerTest {
         this.formDataEncoder = formDataEncoder;
     }
 
+    @WithUserDetails(value = "eunahTest",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[view][POST] Create Comment - Normal Retrieval")
     @Test
     void givenPostingCommentInfo_whenRequesting_thenSavesNewPostingComment() throws Exception {
@@ -63,13 +67,15 @@ class PostingCommentControllerTest {
         then(postingCommentService).should().savePostingComment(any(PostingCommentDto.class));
     }
 
+    @WithUserDetails(value = "eunahTest",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[view][GET] Delete comment - Normal Retrieval")
     @Test
     void givenPostingCommentIdToDelete_whenRequesting_thenDeletesPostingComment() throws Exception {
         // Given
         long postingId = 1L;
         long postingCommentId = 1L;
-        willDoNothing().given(postingCommentService).deletePostingComment(postingCommentId);
+        String userId = "eunahTest";
+        willDoNothing().given(postingCommentService).deletePostingComment(postingCommentId, userId);
 
         // When & Then
         mvc.perform(
@@ -81,7 +87,7 @@ class PostingCommentControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/postings/" + postingId))
                 .andExpect(redirectedUrl("/postings/" + postingId));
-        then(postingCommentService).should().deletePostingComment(postingCommentId);
+        then(postingCommentService).should().deletePostingComment(postingCommentId, userId);
     }
 
 

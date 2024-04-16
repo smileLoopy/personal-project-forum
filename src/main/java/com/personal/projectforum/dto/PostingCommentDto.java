@@ -2,6 +2,7 @@ package com.personal.projectforum.dto;
 
 import com.personal.projectforum.domain.Posting;
 import com.personal.projectforum.domain.PostingComment;
+import com.personal.projectforum.domain.UserAccount;
 
 import java.time.LocalDateTime;
 
@@ -18,6 +19,10 @@ public record PostingCommentDto(
         LocalDateTime modifiedAt,
         String modifiedBy
 ) {
+
+  public static PostingCommentDto of(Long articleId, UserAccountDto userAccountDto, String content) {
+    return new PostingCommentDto(null, articleId, userAccountDto, content, null, null, null, null);
+  }
 
   public static PostingCommentDto of(Long id, Long articleId, UserAccountDto userAccountDto, String content, LocalDateTime createdAt, String createdBy, LocalDateTime modifiedAt, String modifiedBy) {
     return new PostingCommentDto(id, articleId, userAccountDto, content, createdAt, createdBy, modifiedAt, modifiedBy);
@@ -36,10 +41,10 @@ public record PostingCommentDto(
     );
   }
 
-  public PostingComment toEntity(Posting entity) {
+  public PostingComment toEntity(Posting posting, UserAccount userAccount) {
     return PostingComment.of(
-            entity,
-            userAccountDto.toEntity(),
+            posting,
+            userAccount,
             content
     );
   }

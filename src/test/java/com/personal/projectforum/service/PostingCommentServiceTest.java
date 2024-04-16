@@ -7,6 +7,7 @@ import com.personal.projectforum.dto.PostingCommentDto;
 import com.personal.projectforum.dto.UserAccountDto;
 import com.personal.projectforum.repository.PostingCommentRepository;
 import com.personal.projectforum.repository.PostingRepository;
+import com.personal.projectforum.repository.UserAccountRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,7 @@ class PostingCommentServiceTest {
 
     @Mock private PostingRepository postingRepository;
     @Mock private PostingCommentRepository postingCommentRepository;
+    @Mock private UserAccountRepository userAccountRepository;
 
     @DisplayName("Search with posting Id, return comment list")
     @Test
@@ -57,6 +59,7 @@ class PostingCommentServiceTest {
         // Given
         PostingCommentDto dto = createPostingCommentDto("comment");
         given(postingRepository.getReferenceById(dto.postingId())).willReturn(createPosting());
+        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(createUserAccount());
         given(postingCommentRepository.save(any(PostingComment.class))).willReturn(null);
 
         // When
@@ -64,6 +67,7 @@ class PostingCommentServiceTest {
 
         // Then
         then(postingRepository).should().getReferenceById(dto.postingId());
+        then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
         then(postingCommentRepository).should().save(any(PostingComment.class));
     }
 
@@ -79,6 +83,7 @@ class PostingCommentServiceTest {
 
         // Then
         then(postingRepository).should().getReferenceById(dto.postingId());
+        then(userAccountRepository).shouldHaveNoInteractions();
         then(postingCommentRepository).shouldHaveNoInteractions();
     }
 

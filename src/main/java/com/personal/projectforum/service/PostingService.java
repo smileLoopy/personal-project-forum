@@ -53,7 +53,7 @@ public class PostingService {
     public PostingDto getPosting(Long postingId) {
         return postingRepository.findById(postingId)
                 .map(PostingDto::from)
-                .orElseThrow(() -> new EntityNotFoundException("No posting - postingId: " + postingId));
+                .orElseThrow(() -> new EntityNotFoundException("Posting not exist - postingId: " + postingId));
     }
 
     public void savePosting(PostingDto dto) {

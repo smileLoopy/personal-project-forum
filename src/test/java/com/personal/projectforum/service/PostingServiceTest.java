@@ -131,7 +131,7 @@ class PostingServiceTest {
         // Then
         assertThat(t)
                 .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage("No posting exist - postingId: " + postingId);
+                .hasMessage("Posting not exist - postingId: " + postingId);
         then(postingRepository).should().findById(postingId);
     }
 

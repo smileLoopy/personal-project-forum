@@ -1,12 +1,14 @@
 package com.personal.projectforum.controller;
 
 import com.personal.projectforum.config.SecurityConfig;
+import com.personal.projectforum.config.TestSecurityConfig;
 import com.personal.projectforum.domain.constant.FormStatus;
 import com.personal.projectforum.domain.constant.SearchType;
 import com.personal.projectforum.dto.PostingDto;
 import com.personal.projectforum.dto.PostingWithCommentsDto;
 import com.personal.projectforum.dto.UserAccountDto;
 import com.personal.projectforum.dto.request.PostingRequest;
+import com.personal.projectforum.dto.security.ForumPrincipal;
 import com.personal.projectforum.response.PostingResponse;
 import com.personal.projectforum.service.PaginationService;
 import com.personal.projectforum.service.PostingService;
@@ -23,6 +25,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.TestExecutionEvent;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -33,11 +39,12 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@Import({SecurityConfig.class, FormDataEncoder.class})
+@Import({TestSecurityConfig.class, FormDataEncoder.class})
 @DisplayName("View Controller - Posting")
 @WebMvcTest(PostingController.class)
 class PostingControllerTest {
@@ -127,7 +134,23 @@ class PostingControllerTest {
         then(paginationService).should().getPaginationBarNumbers(pageable.getPageNumber(), Page.empty().getTotalPages());
     }
 
-    @DisplayName("[view] [GET] Posting Detail Page - Normal Retrieval Case")
+    @DisplayName("[view][GET] Posting Detail Page - No authentication, redirect to login page")
+    @Test
+    void givenNothing_whenRequestingPostingPage_thenRedirectsToLoginPage() throws Exception {
+        //TODO: Test is not passing yet
+        // Given
+        long postingId = 1L;
+
+        // When & Then
+        mvc.perform(get("/postings/" + postingId))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+        then(postingService).shouldHaveNoInteractions();
+        then(postingService).shouldHaveNoInteractions();
+    }
+
+    @WithMockUser
+    @DisplayName("[view] [GET] Posting Detail Page - Normal Retrieval Case, Authenticated user")
     @Test
     public void givenNothing_whenRequestingPostingView_thenReturnsPostingView() throws Exception {
         // Given
@@ -210,6 +233,7 @@ class PostingControllerTest {
     }
 
 
+    @WithMockUser
     @DisplayName("[view][GET] Writing new posting page")
     @Test
     void givenNothing_whenRequesting_thenReturnsNewPostingPage() throws Exception {
@@ -223,6 +247,7 @@ class PostingControllerTest {
                 .andExpect(model().attribute("formStatus", FormStatus.CREATE));
     }
 
+    @WithUserDetails(value = "eunahTest",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[view][POST] Saving new posting - Normal Retrieval")
     @Test
     void givenNewPostingInfo_whenRequesting_thenSavesNewPosting() throws Exception {
@@ -243,6 +268,21 @@ class PostingControllerTest {
         then(postingService).should().savePosting(any(PostingDto.class));
     }
 
+    @DisplayName("[view][GET] Update posting page - No authentication redirect to login page")
+    @Test
+    void givenNothing_whenRequesting_thenRedirectsToLoginPage() throws Exception {
+        //TODO: Test is not passing yet
+        // Given
+        long postingId = 1L;
+
+        // When & Then
+        mvc.perform(get("/postings/" + postingId + "/form"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrlPattern("**/login"));
+        then(postingService).shouldHaveNoInteractions();
+    }
+
+    @WithMockUser
     @DisplayName("[view][GET] Update posting page")
     @Test
     void givenNothing_whenRequesting_thenReturnsUpdatedPostingPage() throws Exception {
@@ -261,6 +301,7 @@ class PostingControllerTest {
         then(postingService).should().getPosting(postingId);
     }
 
+    @WithUserDetails(value = "eunahTest",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[view][POST] Update posting - Normal Retrieval")
     @Test
     void givenUpdatedPostingInfo_whenRequesting_thenUpdatesNewPosting() throws Exception {
@@ -282,12 +323,14 @@ class PostingControllerTest {
         then(postingService).should().updatePosting(eq(postingId), any(PostingDto.class));
     }
 
+    @WithUserDetails(value = "eunahTest",setupBefore = TestExecutionEvent.TEST_EXECUTION)
     @DisplayName("[view][POST] Delete posting - Normal Retrieval")
     @Test
     void givenPostingIdToDelete_whenRequesting_thenDeletesPosting() throws Exception {
         // Given
         long postingId = 1L;
-        willDoNothing().given(postingService).deletePosting(postingId);
+        String userid = "eunahTest";
+        willDoNothing().given(postingService).deletePosting(postingId, userid);
 
         // When & Then
         mvc.perform(
@@ -298,7 +341,7 @@ class PostingControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/postings"))
                 .andExpect(redirectedUrl("/postings"));
-        then(postingService).should().deletePosting(postingId);
+        then(postingService).should().deletePosting(postingId, userid);
     }
 
 

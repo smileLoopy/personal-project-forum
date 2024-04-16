@@ -15,7 +15,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DisplayName("Test Tool - Form Data Encoder")
 @Import({FormDataEncoder.class, ObjectMapper.class})
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = Void.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE, classes = FormDataEncoder.class)
 public class FormDataEncoderTest {
 
     private final FormDataEncoder formDataEncoder;

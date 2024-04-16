@@ -3,6 +3,7 @@ package com.personal.projectforum.controller;
 import com.personal.projectforum.domain.constant.FormStatus;
 import com.personal.projectforum.domain.constant.SearchType;
 import com.personal.projectforum.dto.UserAccountDto;
+import com.personal.projectforum.dto.security.ForumPrincipal;
 import com.personal.projectforum.response.PostingResponse;
 import com.personal.projectforum.dto.request.PostingRequest;
 import com.personal.projectforum.response.PostingWithCommentsResponse;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -80,11 +82,11 @@ public class PostingController {
     }
 
     @PostMapping("/form")
-    public String postNewPosting(PostingRequest postingRequest) {
-        // TODO: Need to insert authentication info.
-        postingService.savePosting(postingRequest.toDto(UserAccountDto.of(
-                "eunah", "passward", "eunah@mail.com", "Eunah", "memo"
-        )));
+    public String postNewPosting(
+            @AuthenticationPrincipal ForumPrincipal forumPrincipal,
+            PostingRequest postingRequest
+    ) {
+        postingService.savePosting(postingRequest.toDto(forumPrincipal.toDto()));
 
         return "redirect:/postings";
     }
@@ -100,19 +102,22 @@ public class PostingController {
     }
 
     @PostMapping ("/{postingId}/form")
-    public String updatePosting(@PathVariable Long postingId, PostingRequest postingRequest) {
-        // TODO: Need to insert authentication info
-        postingService.updatePosting(postingId, postingRequest.toDto(UserAccountDto.of(
-                "eunah", "passward", "eunah@mail.com", "Eunah", "memo", null, null, null, null
-        )));
+    public String updatePosting(
+            @PathVariable Long postingId,
+            @AuthenticationPrincipal ForumPrincipal forumPrincipal,
+            PostingRequest postingRequest
+    ) {
+        postingService.updatePosting(postingId, postingRequest.toDto(forumPrincipal.toDto()));
 
         return "redirect:/postings/" + postingId;
     }
 
     @PostMapping ("/{postingId}/delete")
-    public String deletePosting(@PathVariable Long postingId) {
-        // TODO: eed to insert authentication info
-        postingService.deletePosting(postingId);
+    public String deletePosting(
+            @PathVariable Long postingId,
+            @AuthenticationPrincipal ForumPrincipal forumPrincipal
+    ) {
+        postingService.deletePosting(postingId, forumPrincipal.getUsername());
 
         return "redirect:/postings";
     }

@@ -64,16 +64,21 @@ public class PostingService {
     public void updatePosting(Long postingId, PostingDto dto) {
         try {
             Posting posting = postingRepository.getReferenceById(postingId);
-            if(dto.title() != null) { posting.setTitle(dto.title()); }
-            if(dto.content() != null) { posting.setContent(dto.content()); }
-            posting.setHashtag(dto.hashtag());
+            UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
+
+            if(posting.getUserAccount().getUserId().equals(userAccount.getUserId())) {
+                if(dto.title() != null) { posting.setTitle(dto.title()); }
+                if(dto.content() != null) { posting.setContent(dto.content()); }
+                posting.setHashtag(dto.hashtag());
+            }
         } catch (EntityNotFoundException e) {
-            log.warn("Posting Update Failed. Not possible to find the posting - dto: {}", dto);
+            log.warn("Posting Update Failed. Can not find info for updating posting - {}", e.getLocalizedMessage());
         }
     }
 
-    public void deletePosting(long postingId) {
-        postingRepository.deleteById(postingId);
+    public void deletePosting(long postingId, String userId) {
+
+        postingRepository.deleteByIdAndUserAccount_UserId(postingId, userId);
     }
 
     public long getPostingCount() {

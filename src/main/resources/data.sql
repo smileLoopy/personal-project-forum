@@ -1,10 +1,10 @@
 -- test account
 -- TODO: password is exposed. need to think of how to improve it
 insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values
-('eunah', 'password', 'Eunah', 'eunah@mail.com', 'I am Eunah.', now(), 'eunah', now(), 'eunah')
+('eunah', '{noop}password', 'Eunah', 'eunah@mail.com', 'I am Eunah.', now(), 'eunah', now(), 'eunah')
 ;
 insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values
-    ('eunah2', 'password', 'Eunah2', 'eunah2@mail.com', 'I am Eunah2.', now(), 'eunah2', now(), 'eunah2')
+    ('eunah2', '{noop}password', 'Eunah2', 'eunah2@mail.com', 'I am Eunah2.', now(), 'eunah2', now(), 'eunah2')
 ;
 
 -- 123 postings

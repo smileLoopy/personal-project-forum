@@ -126,13 +126,14 @@ class PostingCommentServiceTest {
     void givenPostingCommentId_whenDeletingPostingComment_thenDeletesPostingComment() {
         // Given
         Long postingCommentId = 1L;
-        willDoNothing().given(postingCommentRepository).deleteById(postingCommentId);
+        String userId = "eunah";
+        willDoNothing().given(postingCommentRepository).deleteByIdAndUserAccount_UserId(postingCommentId, userId);
 
         // When
-        sut.deletePostingComment(postingCommentId);
+        sut.deletePostingComment(postingCommentId, userId);
 
         // Then
-        then(postingCommentRepository).should().deleteById(postingCommentId);
+        then(postingCommentRepository).should().deleteByIdAndUserAccount_UserId(postingCommentId, userId);
     }
 
 

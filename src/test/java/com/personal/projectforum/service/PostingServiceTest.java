@@ -196,6 +196,7 @@ class PostingServiceTest {
         Posting posting = createPosting();
         PostingDto dto = createPostingDto("new title", "new content", "#springboot");
         given(postingRepository.getReferenceById(dto.id())).willReturn(posting);
+        given(userAccountRepository.getReferenceById(dto.userAccountDto().userId())).willReturn(dto.userAccountDto().toEntity());
 
         // When
         sut.updatePosting(dto.id(), dto);
@@ -206,6 +207,7 @@ class PostingServiceTest {
                 .hasFieldOrPropertyWithValue("content", dto.content())
                 .hasFieldOrPropertyWithValue("hashtag", dto.hashtag());
         then(postingRepository).should().getReferenceById(dto.id());
+        then(userAccountRepository).should().getReferenceById(dto.userAccountDto().userId());
     }
 
     @DisplayName("Input nonexistent modify info of posting, print warning log and do nothing.")
@@ -227,12 +229,13 @@ class PostingServiceTest {
     void givenPostingId_whenDeletingPosting_thenDeletesPosting() {
         // Given
         Long postingId = 1L;
-        //willDoNothing().given(postingRepository).delete(any(Posting.class));
+        String userId = "eunah";
+        willDoNothing().given(postingRepository).deleteByIdAndUserAccount_UserId(postingId, userId);
         // When
-        sut.deletePosting(1L);
+        sut.deletePosting(1L, userId);
 
         // Then
-        then(postingRepository).should().deleteById(postingId);
+        then(postingRepository).should().deleteByIdAndUserAccount_UserId(postingId, userId);
     }
 
     @DisplayName("Search posting count, return posting count")

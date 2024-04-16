@@ -137,7 +137,6 @@ class PostingControllerTest {
     @DisplayName("[view][GET] Posting Detail Page - No authentication, redirect to login page")
     @Test
     void givenNothing_whenRequestingPostingPage_thenRedirectsToLoginPage() throws Exception {
-        //TODO: Test is not passing yet
         // Given
         long postingId = 1L;
 
@@ -271,7 +270,6 @@ class PostingControllerTest {
     @DisplayName("[view][GET] Update posting page - No authentication redirect to login page")
     @Test
     void givenNothing_whenRequesting_thenRedirectsToLoginPage() throws Exception {
-        //TODO: Test is not passing yet
         // Given
         long postingId = 1L;
 

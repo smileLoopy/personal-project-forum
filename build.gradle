@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'com.personal'
-version = '0.0.1-SNAPSHOT'
+version = 'v1.1'
 
 java {
     sourceCompatibility = '17'
@@ -73,4 +73,11 @@ sourceSets {
 // Delete directory when gradle clean
 clean {
     delete file(generated)
+}
+
+// Setting Heroku
+jar {
+    manifest {
+        attributes('Main-Class': 'com.personal.projectforum.PersonalProjectForumApplication')
+    }
 }

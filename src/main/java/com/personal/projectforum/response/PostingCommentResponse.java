@@ -16,11 +16,12 @@ public record PostingCommentResponse(
         String content,
         LocalDateTime createdAt,
         String email,
-        String nickname
+        String nickname,
+        String userId
 ) {
 
-  public static PostingCommentResponse of(Long id, String content, LocalDateTime createdAt, String email, String nickname) {
-    return new PostingCommentResponse(id, content, createdAt, email, nickname);
+  public static PostingCommentResponse of(Long id, String content, LocalDateTime createdAt, String email, String nickname, String userId) {
+    return new PostingCommentResponse(id, content, createdAt, email, nickname, userId);
   }
 
   public static PostingCommentResponse from(PostingCommentDto dto) {
@@ -34,7 +35,8 @@ public record PostingCommentResponse(
             dto.content(),
             dto.createdAt(),
             dto.userAccountDto().email(),
-            nickname
+            nickname,
+            dto.userAccountDto().userId()
     );
   }
 }

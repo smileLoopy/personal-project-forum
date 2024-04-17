@@ -25,7 +25,7 @@ Spring Boot
 Etc
 
 * QueryDSL 5.0.0
-* Bootstrap 5.2.0-Beta1
+* Bootstrap 5.3.3
 * Heroku
 
 ## Demo Page

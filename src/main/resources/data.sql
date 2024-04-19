@@ -7,6 +7,10 @@ insert into user_account (user_id, user_password, nickname, email, memo, created
     ('eunah2', '{noop}password', 'Eunah2', 'eunah2@mail.com', 'I am Eunah2.', now(), 'eunah2', now(), 'eunah2')
 ;
 
+insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values
+    ('cole', '{noop}eunah', 'Cole', 'cole@mail.com', 'I am Cole.', now(), 'cole', now(), 'cole')
+;
+
 -- 123 postings
 insert into posting (user_id, title, content, hashtag, created_by, modified_by, created_at, modified_at) values
 ('eunah2', 'Quisque ut erat.', 'Vestibulum quam sapien, varius ut, blandit non, interdum in, ante. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Duis faucibus accumsan odio. Curabitur convallis.

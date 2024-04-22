@@ -2,10 +2,9 @@ package com.personal.projectforum.controller;
 
 import com.personal.projectforum.domain.constant.FormStatus;
 import com.personal.projectforum.domain.constant.SearchType;
-import com.personal.projectforum.dto.UserAccountDto;
+import com.personal.projectforum.dto.request.PostingRequest;
 import com.personal.projectforum.dto.security.ForumPrincipal;
 import com.personal.projectforum.response.PostingResponse;
-import com.personal.projectforum.dto.request.PostingRequest;
 import com.personal.projectforum.response.PostingWithCommentsResponse;
 import com.personal.projectforum.service.PaginationService;
 import com.personal.projectforum.service.PostingService;
@@ -21,12 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-/*
-* /postings
-* /postings/{posting-id}
-* /postings/search
-* /postings/search-hashtag
-* */
 @RequiredArgsConstructor
 @RequestMapping("/postings")
 @Controller
@@ -102,7 +95,7 @@ public class PostingController {
         return "postings/form";
     }
 
-    @PostMapping ("/{postingId}/form")
+    @PostMapping("/{postingId}/form")
     public String updatePosting(
             @PathVariable Long postingId,
             @AuthenticationPrincipal ForumPrincipal forumPrincipal,
@@ -113,7 +106,7 @@ public class PostingController {
         return "redirect:/postings/" + postingId;
     }
 
-    @PostMapping ("/{postingId}/delete")
+    @PostMapping("/{postingId}/delete")
     public String deletePosting(
             @PathVariable Long postingId,
             @AuthenticationPrincipal ForumPrincipal forumPrincipal

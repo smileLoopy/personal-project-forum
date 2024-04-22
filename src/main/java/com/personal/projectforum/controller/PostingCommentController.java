@@ -1,6 +1,5 @@
 package com.personal.projectforum.controller;
 
-import com.personal.projectforum.dto.UserAccountDto;
 import com.personal.projectforum.dto.request.PostingCommentRequest;
 import com.personal.projectforum.dto.security.ForumPrincipal;
 import com.personal.projectforum.service.PostingCommentService;
@@ -29,7 +28,7 @@ public class PostingCommentController {
         return "redirect:/postings/" + postingCommentRequest.postingId();
     }
 
-    @PostMapping ("/{commentId}/delete")
+    @PostMapping("/{commentId}/delete")
     public String deletePostingComment(
             @PathVariable Long commentId,
             @AuthenticationPrincipal ForumPrincipal forumPrincipal,

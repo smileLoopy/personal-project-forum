@@ -6,13 +6,12 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.wavefront.WavefrontProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 @DisplayName("Business Logic - Pagination")
@@ -21,7 +20,7 @@ class PaginationServiceTest {
 
     private final PaginationService sut;
 
-    public PaginationServiceTest(@Autowired PaginationService paginationService) {
+    PaginationServiceTest(@Autowired PaginationService paginationService) {
         this.sut = paginationService;
     }
 

@@ -1,6 +1,5 @@
 package com.personal.projectforum.repository;
 
-import com.personal.projectforum.config.JpaConfig;
 import com.personal.projectforum.domain.Posting;
 import com.personal.projectforum.domain.UserAccount;
 import org.junit.jupiter.api.DisplayName;
@@ -13,7 +12,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,7 +25,7 @@ class JPARepositoryTest {
     private final PostingCommentRepository postingCommentRepository;
     private final UserAccountRepository userAccountRepository;
 
-    public JPARepositoryTest(
+    JPARepositoryTest(
             @Autowired PostingRepository postingRepository,
             @Autowired PostingCommentRepository postingCommentRepository,
             @Autowired UserAccountRepository userAccountRepository
@@ -108,9 +106,9 @@ class JPARepositoryTest {
 
     @EnableJpaAuditing
     @TestConfiguration
-    public static class TestJpaConfig {
+    static class TestJpaConfig {
         @Bean
-        public AuditorAware<String> auditorAware() {
+        AuditorAware<String> auditorAware() {
             return  () -> Optional.of("eunah");
         }
     }

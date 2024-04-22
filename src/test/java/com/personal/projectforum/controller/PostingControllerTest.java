@@ -1,6 +1,5 @@
 package com.personal.projectforum.controller;
 
-import com.personal.projectforum.config.SecurityConfig;
 import com.personal.projectforum.config.TestSecurityConfig;
 import com.personal.projectforum.domain.constant.FormStatus;
 import com.personal.projectforum.domain.constant.SearchType;
@@ -8,7 +7,6 @@ import com.personal.projectforum.dto.PostingDto;
 import com.personal.projectforum.dto.PostingWithCommentsDto;
 import com.personal.projectforum.dto.UserAccountDto;
 import com.personal.projectforum.dto.request.PostingRequest;
-import com.personal.projectforum.dto.security.ForumPrincipal;
 import com.personal.projectforum.response.PostingResponse;
 import com.personal.projectforum.service.PaginationService;
 import com.personal.projectforum.service.PostingService;
@@ -28,7 +26,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.TestExecutionEvent;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.test.context.support.WithUserDetails;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -38,8 +35,6 @@ import java.util.Set;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -55,7 +50,7 @@ class PostingControllerTest {
     @MockBean private PostingService postingService;
     @MockBean private PaginationService paginationService;
 
-    public PostingControllerTest(
+    PostingControllerTest(
             @Autowired MockMvc mvc,
             @Autowired FormDataEncoder formDataEncoder
     ) {
@@ -65,7 +60,7 @@ class PostingControllerTest {
 
     @DisplayName("[view] [GET] Posting List (Forum) Page - Normal Retrieval Case")
     @Test
-    public void givenNothing_whenRequestingPostingsView_thenReturnsPostingsView() throws Exception {
+    void givenNothing_whenRequestingPostingsView_thenReturnsPostingsView() throws Exception {
         // Given
         given(postingService.searchPostings(eq(null), eq(null), any(Pageable.class))).willReturn(Page.empty());
         given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(0, 1, 2, 3, 4));
@@ -83,7 +78,7 @@ class PostingControllerTest {
 
     @DisplayName("[view] [GET] Posting List (Forum) Page - Retrieval with search keyword")
     @Test
-    public void givenSearchKeyword_whenSearchingPostingsView_thenReturnsPostingsView() throws Exception {
+    void givenSearchKeyword_whenSearchingPostingsView_thenReturnsPostingsView() throws Exception {
         // Given
         SearchType searchType = SearchType.TITLE;
         String searchValue = "title";
@@ -151,7 +146,7 @@ class PostingControllerTest {
     @WithMockUser
     @DisplayName("[view] [GET] Posting Detail Page - Normal Retrieval Case, Authenticated user")
     @Test
-    public void givenNothing_whenRequestingPostingView_thenReturnsPostingView() throws Exception {
+    void givenNothing_whenRequestingPostingView_thenReturnsPostingView() throws Exception {
         // Given
         Long postingId = 1L;
         long totalCount = 1L;
@@ -165,7 +160,6 @@ class PostingControllerTest {
                 .andExpect(view().name("postings/detail"))
                 .andExpect(model().attributeExists("posting"))
                 .andExpect(model().attributeExists("postingComments"))
-                .andExpect(model().attributeExists("postingComments"))
                 .andExpect(model().attribute("totalCount", totalCount));
         then(postingService).should().getPostingWithComments(postingId);
         then(postingService).should().getPostingCount();
@@ -174,7 +168,7 @@ class PostingControllerTest {
     @Disabled("Development in progress")
     @DisplayName("[view] [GET] Posting Search Page - Normal Retrieval Case")
     @Test
-    public void givenNothing_whenRequestingPostingSearchView_thenReturnsPostingSearchView() throws Exception {
+    void givenNothing_whenRequestingPostingSearchView_thenReturnsPostingSearchView() throws Exception {
         // Given
 
         // When & Then
@@ -186,7 +180,7 @@ class PostingControllerTest {
 
     @DisplayName("[view] [GET] Posting Search Hashtag Page - Normal Retrieval Case")
     @Test
-    public void givenNothing_whenRequestingPostingSearchHashtagView_thenReturnsPostingSearchHashtagView() throws Exception {
+    void givenNothing_whenRequestingPostingSearchHashtagView_thenReturnsPostingSearchHashtagView() throws Exception {
         // Given
         List<String> hashtags = List.of("#java", "#spring", "#boot");
         given(postingService.searchPostingsViaHashtag(eq(null), any(Pageable.class))).willReturn(Page.empty());
@@ -208,7 +202,7 @@ class PostingControllerTest {
 
     @DisplayName("[view] [GET] Posting Search Hashtag Page - Normal Retrieval Case, Input hashtag")
     @Test
-    public void givenHashtag_whenRequestingPostingSearchHashtagView_thenReturnsPostingSearchHashtagView() throws Exception {
+    void givenHashtag_whenRequestingPostingSearchHashtagView_thenReturnsPostingSearchHashtagView() throws Exception {
         // Given
         String hashtag = "#java";
         List<String> hashtags = List.of("#java", "#spring", "#boot");

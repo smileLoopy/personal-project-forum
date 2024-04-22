@@ -1,6 +1,5 @@
 package com.personal.projectforum.controller;
 
-import com.personal.projectforum.config.SecurityConfig;
 import com.personal.projectforum.config.TestSecurityConfig;
 import com.personal.projectforum.dto.PostingCommentDto;
 import com.personal.projectforum.dto.request.PostingCommentRequest;
@@ -19,7 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -37,7 +35,7 @@ class PostingCommentControllerTest {
 
     @MockBean private PostingCommentService postingCommentService;
 
-    public PostingCommentControllerTest(
+    PostingCommentControllerTest(
             @Autowired MockMvc mvc,
             @Autowired FormDataEncoder formDataEncoder
     ) {

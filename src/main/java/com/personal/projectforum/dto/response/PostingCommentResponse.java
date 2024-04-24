@@ -1,11 +1,8 @@
-package com.personal.projectforum.response;
+package com.personal.projectforum.dto.response;
 
-import com.personal.projectforum.domain.Posting;
 import com.personal.projectforum.domain.PostingComment;
 import com.personal.projectforum.dto.PostingCommentDto;
-import com.personal.projectforum.dto.UserAccountDto;
 
-import java.io.Serializable;
 import java.time.LocalDateTime;
 
 /**

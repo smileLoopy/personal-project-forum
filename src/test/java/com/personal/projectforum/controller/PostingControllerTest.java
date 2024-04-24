@@ -7,7 +7,7 @@ import com.personal.projectforum.dto.PostingDto;
 import com.personal.projectforum.dto.PostingWithCommentsDto;
 import com.personal.projectforum.dto.UserAccountDto;
 import com.personal.projectforum.dto.request.PostingRequest;
-import com.personal.projectforum.response.PostingResponse;
+import com.personal.projectforum.dto.response.PostingResponse;
 import com.personal.projectforum.service.PaginationService;
 import com.personal.projectforum.service.PostingService;
 import com.personal.projectforum.util.FormDataEncoder;

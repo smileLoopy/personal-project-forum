@@ -51,12 +51,12 @@ public class Posting extends AuditingFields{
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof  Posting posting)) return false;
-        return id !=null && id.equals(posting.id);
+        if (!(o instanceof  Posting that)) return false;
+        return this.getId() != null && this.getId().equals(that.getId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id);
+        return Objects.hash(this.getId());
     }
 }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -13,7 +14,6 @@ import java.util.Set;
 @ToString(callSuper = true)
 @Table(indexes = {
         @Index(columnList = "title"),
-        @Index(columnList = "hashtag"),
         @Index(columnList = "createdAt"),
         @Index(columnList = "createdBy"),
 })
@@ -25,14 +25,21 @@ public class Posting extends AuditingFields{
     private Long id;
 
     @Setter
-    @ManyToOne(optional = false)
     @JoinColumn(name = "userId")
+    @ManyToOne(optional = false)
     private UserAccount userAccount;
 
     @Setter @Column(nullable = false) private String title;
     @Setter @Column(nullable = false, length = 1000) private String content;
 
-    @Setter private String hashtag;
+    @ToString.Exclude
+    @JoinTable(
+            name = "posting_hashtag",
+            joinColumns = @JoinColumn(name = "postingId"),
+            inverseJoinColumns = @JoinColumn(name = "hashtagId")
+    )
+    @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private Set<Hashtag> hashtags = new LinkedHashSet<>();
 
     @ToString.Exclude
     @OrderBy("createdAt DESC")
@@ -41,15 +48,26 @@ public class Posting extends AuditingFields{
 
     protected Posting() {}
     // Hide it with privte and open it with factory method
-    private Posting(UserAccount userAccount, String title, String content, String hashtag) {
+    private Posting(UserAccount userAccount, String title, String content) {
         this.userAccount = userAccount;
         this.title = title;
         this.content = content;
-        this.hashtag = hashtag;
     }
     // Factory method
-    public static Posting of(UserAccount userAccount, String title, String content, String hashtag) {
-        return new Posting(userAccount,title, content, hashtag);
+    public static Posting of(UserAccount userAccount, String title, String content) {
+        return new Posting(userAccount,title, content);
+    }
+
+    public void addHashtag(Hashtag hashtag) {
+        this.getHashtags().add(hashtag);
+    }
+
+    public void addHashtags(Collection<Hashtag> hashtags) {
+        this.getHashtags().addAll(hashtags);
+    }
+
+    public void clearHashtags() {
+        this.getHashtags().clear();
     }
 
     @Override

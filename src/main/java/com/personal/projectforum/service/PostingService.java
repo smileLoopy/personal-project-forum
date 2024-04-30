@@ -15,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -37,7 +38,11 @@ public class PostingService {
             case CONTENT -> postingRepository.findByContentContaining(searchKeyword, pageable).map(PostingDto::from);
             case ID -> postingRepository.findByUserAccount_UserIdContaining(searchKeyword, pageable).map(PostingDto::from);
             case NICKNAME -> postingRepository.findByUserAccount_NicknameContaining(searchKeyword, pageable).map(PostingDto::from);
-            case HASHTAG -> postingRepository.findByHashtag("#" + searchKeyword, pageable).map(PostingDto::from);
+            case HASHTAG -> postingRepository.findByHashtagNames(
+                            Arrays.stream(searchKeyword.split(" ")).toList(),
+                            pageable
+                    )
+                    .map(PostingDto::from);
         };
 
     }
@@ -69,7 +74,6 @@ public class PostingService {
             if(posting.getUserAccount().getUserId().equals(userAccount.getUserId())) {
                 if(dto.title() != null) { posting.setTitle(dto.title()); }
                 if(dto.content() != null) { posting.setContent(dto.content()); }
-                posting.setHashtag(dto.hashtag());
             }
         } catch (EntityNotFoundException e) {
             log.warn("Posting Update Failed. Can not find info for updating posting - {}", e.getLocalizedMessage());
@@ -91,7 +95,7 @@ public class PostingService {
             return Page.empty(pageable);
         }
 
-        return postingRepository.findByHashtag(hashtag, pageable).map(PostingDto::from);
+        return postingRepository.findByHashtagNames(null, pageable).map(PostingDto::from);
     }
 
     public List<String> getHashtags() {

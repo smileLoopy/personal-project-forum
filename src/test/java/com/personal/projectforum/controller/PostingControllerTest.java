@@ -3,6 +3,7 @@ package com.personal.projectforum.controller;
 import com.personal.projectforum.config.TestSecurityConfig;
 import com.personal.projectforum.domain.constant.FormStatus;
 import com.personal.projectforum.domain.constant.SearchType;
+import com.personal.projectforum.dto.HashtagDto;
 import com.personal.projectforum.dto.PostingDto;
 import com.personal.projectforum.dto.PostingWithCommentsDto;
 import com.personal.projectforum.dto.UserAccountDto;
@@ -71,7 +72,9 @@ class PostingControllerTest {
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
                 .andExpect(view().name("postings/index"))
                 .andExpect(model().attributeExists("postings"))
-                .andExpect(model().attributeExists("paginationBarNumbers"));
+                .andExpect(model().attributeExists("paginationBarNumbers"))
+                .andExpect(model().attributeExists("searchTypes"))
+                .andExpect(model().attribute("searchTypeHashtag", SearchType.HASHTAG));;
         then(postingService).should().searchPostings(eq(null), eq(null), any(Pageable.class));
         then(paginationService).should().getPaginationBarNumbers(anyInt(), anyInt());
     }
@@ -87,9 +90,10 @@ class PostingControllerTest {
         given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(0, 1, 2, 3, 4));
 
         // When & Then
-        mvc.perform(get("/postings")
-                        .queryParam("searchType", searchType.name())
-                        .queryParam("searchValue", searchValue)
+        mvc.perform(
+                        get("/postings")
+                                .queryParam("searchType", searchType.name())
+                                .queryParam("searchValue", searchValue)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
@@ -102,7 +106,7 @@ class PostingControllerTest {
 
     @DisplayName("[view][GET] posting list (forum) page - paging, sorting function")
     @Test
-    void givenPagingAndSortingParams_whenSearchingPostingsPage_thenReturnsPostingsView() throws Exception {
+    void givenPagingAndSortingParams_whenSearchingPostingsView_thenReturnsPostingsView() throws Exception {
         // Given
         String sortName = "title";
         String direction = "desc";
@@ -146,7 +150,7 @@ class PostingControllerTest {
     @WithMockUser
     @DisplayName("[view] [GET] Posting Detail Page - Normal Retrieval Case, Authenticated user")
     @Test
-    void givenNothing_whenRequestingPostingView_thenReturnsPostingView() throws Exception {
+    void givenAuthorizedUser_whenRequestingPostingView_thenReturnsPostingView() throws Exception {
         // Given
         Long postingId = 1L;
         long totalCount = 1L;
@@ -160,7 +164,8 @@ class PostingControllerTest {
                 .andExpect(view().name("postings/detail"))
                 .andExpect(model().attributeExists("posting"))
                 .andExpect(model().attributeExists("postingComments"))
-                .andExpect(model().attribute("totalCount", totalCount));
+                .andExpect(model().attribute("totalCount", totalCount))
+                .andExpect(model().attribute("searchTypeHashtag", SearchType.HASHTAG));
         then(postingService).should().getPostingWithComments(postingId);
         then(postingService).should().getPostingCount();
     }
@@ -210,8 +215,9 @@ class PostingControllerTest {
         given(paginationService.getPaginationBarNumbers(anyInt(), anyInt())).willReturn(List.of(1, 2, 3, 4, 5));
         given(postingService.getHashtags()).willReturn(hashtags);
         // When & Then
-        mvc.perform(get("/postings/search-hashtag")
-                        .queryParam("searchValue", hashtag)
+        mvc.perform(
+                        get("/postings/search-hashtag")
+                                .queryParam("searchValue", hashtag)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
@@ -245,7 +251,7 @@ class PostingControllerTest {
     @Test
     void givenNewPostingInfo_whenRequesting_thenSavesNewPosting() throws Exception {
         // Given
-        PostingRequest postingRequest = PostingRequest.of("new title", "new content", "#new");
+        PostingRequest postingRequest = PostingRequest.of("new title", "new content");
         willDoNothing().given(postingService).savePosting(any(PostingDto.class));
 
         // When & Then
@@ -275,9 +281,9 @@ class PostingControllerTest {
     }
 
     @WithMockUser
-    @DisplayName("[view][GET] Update posting page")
+    @DisplayName("[view][GET] Update posting page - Normal retrieval, authenticated user")
     @Test
-    void givenNothing_whenRequesting_thenReturnsUpdatedPostingPage() throws Exception {
+    void givenAuthorizedUser_whenRequesting_thenReturnsUpdatedPostingPage() throws Exception {
         // Given
         long postingId = 1L;
         PostingDto dto = createPostingDto();
@@ -299,7 +305,7 @@ class PostingControllerTest {
     void givenUpdatedPostingInfo_whenRequesting_thenUpdatesNewPosting() throws Exception {
         // Given
         long postingId = 1L;
-        PostingRequest postingRequest = PostingRequest.of("new title", "new content", "#new");
+        PostingRequest postingRequest = PostingRequest.of("new title", "new content");
         willDoNothing().given(postingService).updatePosting(eq(postingId), any(PostingDto.class));
 
         // When & Then
@@ -342,7 +348,7 @@ class PostingControllerTest {
                 createUserAccountDto(),
                 "title",
                 "content",
-                "#java"
+                Set.of(HashtagDto.of("java"))
         );
     }
 
@@ -354,7 +360,7 @@ class PostingControllerTest {
                 Set.of(),
                 "title",
                 "content",
-                "#java",
+                Set.of(HashtagDto.of("java")),
                 LocalDateTime.now(),
                 "eunah",
                 LocalDateTime.now(),

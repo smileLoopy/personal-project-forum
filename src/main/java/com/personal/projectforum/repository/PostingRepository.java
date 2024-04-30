@@ -24,17 +24,16 @@ public interface PostingRepository extends
     Page<Posting> findByContentContaining(String content, Pageable pageable);
     Page<Posting> findByUserAccount_UserIdContaining(String userId, Pageable pageable);
     Page<Posting> findByUserAccount_NicknameContaining(String nickname, Pageable pageable);
-    Page<Posting> findByHashtag(String hashtag, Pageable pageable);
 
     void deleteByIdAndUserAccount_UserId(Long postingId, String userId);
 
     @Override
     default void customize(QuerydslBindings bindings, QPosting root) {
         bindings.excludeUnlistedProperties(true);
-        bindings.including(root.title, root.content, root.hashtag, root.createdAt, root.createdBy);
+        bindings.including(root.title, root.content, root.hashtags, root.createdAt, root.createdBy);
         bindings.bind(root.title).first(StringExpression::containsIgnoreCase); // query like '%${v}%
         bindings.bind(root.content).first(StringExpression::containsIgnoreCase); // query like '%${v}%
-        bindings.bind(root.hashtag).first(StringExpression::containsIgnoreCase); // query like '%${v}%
+        bindings.bind(root.hashtags.any().hashtagName).first(StringExpression::containsIgnoreCase); // query like '%${v}%
         bindings.bind(root.createdAt).first(DateTimeExpression::eq);
         bindings.bind(root.createdBy).first(StringExpression::containsIgnoreCase); // query like '%${v}%
     }

@@ -1,5 +1,6 @@
 package com.personal.projectforum.repository;
 
+import com.personal.projectforum.domain.Hashtag;
 import com.personal.projectforum.domain.Posting;
 import com.personal.projectforum.domain.UserAccount;
 import org.junit.jupiter.api.DisplayName;
@@ -9,10 +10,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.AuditorAware;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -24,15 +27,18 @@ class JPARepositoryTest {
     private final PostingRepository postingRepository;
     private final PostingCommentRepository postingCommentRepository;
     private final UserAccountRepository userAccountRepository;
+    private final HashtagRepository hashtagRepository;
 
     JPARepositoryTest(
             @Autowired PostingRepository postingRepository,
             @Autowired PostingCommentRepository postingCommentRepository,
-            @Autowired UserAccountRepository userAccountRepository
+            @Autowired UserAccountRepository userAccountRepository,
+            @Autowired HashtagRepository hashtagRepository
     ) {
         this.postingRepository = postingRepository;
         this.postingCommentRepository = postingCommentRepository;
         this.userAccountRepository = userAccountRepository;
+        this.hashtagRepository = hashtagRepository;
     }
 
     @DisplayName("select test")
@@ -40,15 +46,14 @@ class JPARepositoryTest {
     void givenTestData_whenSelecting_thenWorksFine() {
 
         // Given
-        long previousCount = postingRepository.count();
-        UserAccount userAccount = userAccountRepository.save(UserAccount.of("newEunah", "pw", null, null, null));
-        Posting posting = Posting.of(userAccount, "new article", "new content", "#spring");
 
         // When
-        postingRepository.save(posting);
+        List<Posting> postings = postingRepository.findAll();
 
         // Then
-        assertThat(postingRepository.count()).isEqualTo(previousCount + 1);
+        assertThat(postings)
+                .isNotNull()
+                .hasSize(123); // classpath:resources/data.sql (reference)
     }
 
     @DisplayName("insert test")
@@ -58,10 +63,11 @@ class JPARepositoryTest {
         // Given
         long previousCount = postingRepository.count();
         UserAccount userAccount = userAccountRepository.save(UserAccount.of("newEunah", "pw", null, null, null));
-        Posting posting = Posting.of(userAccount, "new article", "new content", "#spring");
+        Posting posting = Posting.of(userAccount, "new article", "new content");
+        posting.addHashtags(Set.of(Hashtag.of("spring")));
 
         // When
-        Posting savedPost = postingRepository.save(posting);
+        postingRepository.save(posting);
 
         // Then
         assertThat(postingRepository.count()).isEqualTo(previousCount + 1);
@@ -74,15 +80,18 @@ class JPARepositoryTest {
 
         // Given
         Posting posting = postingRepository.findById(1L).orElseThrow();
-        String updatedHashtag = "#springboot";
-        posting.setHashtag(updatedHashtag);
+        Hashtag updatedHashtag = Hashtag.of("springboot");
+        posting.clearHashtags();
+        posting.addHashtags(Set.of(updatedHashtag));
 
         // When
         Posting savedPost = postingRepository.saveAndFlush(posting);
 
         // Then
-        assertThat(savedPost).hasFieldOrPropertyWithValue("hashtag", updatedHashtag);
-
+        assertThat(savedPost.getHashtags())
+                .hasSize(1)
+                .extracting("hashtagName", String.class)
+                .containsExactly(updatedHashtag.getHashtagName());
     }
 
     @DisplayName("delete test")
@@ -102,6 +111,42 @@ class JPARepositoryTest {
         assertThat(postingRepository.count()).isEqualTo(previousPostingCount - 1);
         assertThat(postingCommentRepository.count()).isEqualTo(previousPostingCommentCont - deletedCommentsSize);
 
+    }
+
+
+    @DisplayName("[Querydsl] select name from the whole hashtag list")
+    @Test
+    void givenNothing_whenQueryingHashtags_thenReturnsHashtagNames() {
+        // Given
+
+        // When
+        List<String> hashtagNames = hashtagRepository.findAllHashtagNames();
+
+        // Then
+        assertThat(hashtagNames).hasSize(19);
+    }
+
+    @DisplayName("[Querydsl] search posting which is paged by hashtag")
+    @Test
+    void givenHashtagNamesAndPageable_whenQueryingPostings_thenReturnsPostingPage() {
+        // Given
+        List<String> hashtagNames = List.of("blue", "crimson", "fuscia");
+        Pageable pageable = PageRequest.of(0, 5, Sort.by(
+                Sort.Order.desc("hashtags.hashtagName"),
+                Sort.Order.asc("title")
+        ));
+
+        // When
+        Page<Posting> postingPage = postingRepository.findByHashtagNames(hashtagNames, pageable);
+
+        // Then
+        assertThat(postingPage.getContent()).hasSize(pageable.getPageSize());
+        assertThat(postingPage.getContent().get(0).getTitle()).isEqualTo("Fusce posuere felis sed lacus.");
+        assertThat(postingPage.getContent().get(0).getHashtags())
+                .extracting("hashtagName", String.class)
+                .containsExactly("fuscia");
+        assertThat(postingPage.getTotalElements()).isEqualTo(17);
+        assertThat(postingPage.getTotalPages()).isEqualTo(4);
     }
 
     @EnableJpaAuditing

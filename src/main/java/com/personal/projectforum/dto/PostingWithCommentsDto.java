@@ -17,15 +17,15 @@ public record PostingWithCommentsDto(
         Set<PostingCommentDto> postingCommentDtos,
         String title,
         String content,
-        String hashtag,
+        Set<HashtagDto> hashtagDtos,
         LocalDateTime createdAt,
         String createdBy,
         LocalDateTime modifiedAt,
         String modifiedBy
 ) {
 
-  public static PostingWithCommentsDto of(Long id, UserAccountDto userAccountDto, Set<PostingCommentDto> postingCommentDtos, String title, String content, String hashtag, LocalDateTime createdAt, String createdBy, LocalDateTime modifiedAt, String modifiedBy) {
-    return new PostingWithCommentsDto(id, userAccountDto, postingCommentDtos, title, content, hashtag, createdAt, createdBy, modifiedAt, modifiedBy);
+  public static PostingWithCommentsDto of(Long id, UserAccountDto userAccountDto, Set<PostingCommentDto> postingCommentDtos, String title, String content, Set<HashtagDto> hashtagDtos, LocalDateTime createdAt, String createdBy, LocalDateTime modifiedAt, String modifiedBy) {
+    return new PostingWithCommentsDto(id, userAccountDto, postingCommentDtos, title, content, hashtagDtos, createdAt, createdBy, modifiedAt, modifiedBy);
   }
 
   public static PostingWithCommentsDto from(Posting entity) {
@@ -37,7 +37,10 @@ public record PostingWithCommentsDto(
                     .collect(Collectors.toCollection(LinkedHashSet::new)),
             entity.getTitle(),
             entity.getContent(),
-            entity.getHashtag(),
+            entity.getHashtags().stream()
+                    .map(HashtagDto::from)
+                    .collect(Collectors.toUnmodifiableSet())
+            ,
             entity.getCreatedAt(),
             entity.getCreatedBy(),
             entity.getModifiedAt(),

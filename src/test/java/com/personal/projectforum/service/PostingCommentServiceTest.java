@@ -1,5 +1,6 @@
 package com.personal.projectforum.service;
 
+import com.personal.projectforum.domain.Hashtag;
 import com.personal.projectforum.domain.Posting;
 import com.personal.projectforum.domain.PostingComment;
 import com.personal.projectforum.domain.UserAccount;
@@ -20,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -166,7 +168,7 @@ class PostingCommentServiceTest {
 
     private PostingComment createPostingComment(String content) {
         return PostingComment.of(
-                Posting.of(createUserAccount(), "title", "content", "hashtag"),
+                createPosting(),
                 createUserAccount(),
                 content
         );
@@ -183,11 +185,17 @@ class PostingCommentServiceTest {
     }
 
     private Posting createPosting() {
-        return Posting.of(
+        Posting posting = Posting.of(
                 createUserAccount(),
                 "title",
-                "content",
-                "#java"
+                "content"
         );
+        posting.addHashtag((Hashtag) Set.of(createHashtag(posting)));
+
+        return posting;
+    }
+
+    private Hashtag createHashtag(Posting posting) {
+        return Hashtag.of("java");
     }
 }

@@ -91,9 +91,9 @@ class PostingControllerTest {
 
         // When & Then
         mvc.perform(
-                        get("/postings")
-                                .queryParam("searchType", searchType.name())
-                                .queryParam("searchValue", searchValue)
+                get("/postings")
+                        .queryParam("searchType", searchType.name())
+                        .queryParam("searchValue", searchValue)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
@@ -119,10 +119,10 @@ class PostingControllerTest {
 
         // When & Then
         mvc.perform(
-                        get("/postings")
-                                .queryParam("page", String.valueOf(pageNumber))
-                                .queryParam("size", String.valueOf(pageSize))
-                                .queryParam("sort", sortName + "," + direction)
+                get("/postings")
+                        .queryParam("page", String.valueOf(pageNumber))
+                        .queryParam("size", String.valueOf(pageSize))
+                        .queryParam("sort", sortName + "," + direction)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
@@ -216,8 +216,8 @@ class PostingControllerTest {
         given(postingService.getHashtags()).willReturn(hashtags);
         // When & Then
         mvc.perform(
-                        get("/postings/search-hashtag")
-                                .queryParam("searchValue", hashtag)
+                get("/postings/search-hashtag")
+                        .queryParam("searchValue", hashtag)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.TEXT_HTML))
@@ -256,10 +256,10 @@ class PostingControllerTest {
 
         // When & Then
         mvc.perform(
-                        post("/postings/form")
-                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                                .content(formDataEncoder.encode(postingRequest))
-                                .with(csrf())
+                post("/postings/form")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .content(formDataEncoder.encode(postingRequest))
+                        .with(csrf())
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/postings"))
@@ -310,10 +310,10 @@ class PostingControllerTest {
 
         // When & Then
         mvc.perform(
-                        post("/postings/" + postingId + "/form")
-                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                                .content(formDataEncoder.encode(postingRequest))
-                                .with(csrf())
+                post("/postings/" + postingId + "/form")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .content(formDataEncoder.encode(postingRequest))
+                        .with(csrf())
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/postings/" + postingId))
@@ -332,9 +332,9 @@ class PostingControllerTest {
 
         // When & Then
         mvc.perform(
-                        post("/postings/" + postingId + "/delete")
-                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                                .with(csrf())
+                post("/postings/" + postingId + "/delete")
+                        .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                        .with(csrf())
                 )
                 .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("redirect:/postings"))

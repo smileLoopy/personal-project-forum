@@ -21,6 +21,7 @@ public record ForumPrincipal(
 
     public static ForumPrincipal of(String username, String password, String email, String nickname, String memo) {
 
+        // Right now only doing authentication and not dealing with authority, so I set it like this.
         Set<RoleTyle> roleTypes = Set.of(RoleTyle.USER);
 
         return new ForumPrincipal(

@@ -44,6 +44,10 @@ public class PostingCommentService {
         }
     }
 
+    /*
+    * @deprecated We decided not to provide the comment editing function in this development because it makes
+    *             more things to think about client side. Will focus on the other things
+    * */
     public void updatePostingComment(PostingCommentDto dto) {
         try {
             PostingComment postingComment = postingCommentRepository.getReferenceById(dto.id());

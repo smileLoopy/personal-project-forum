@@ -39,6 +39,7 @@ public class PostingController {
         map.addAttribute("postings", postings);
         map.addAttribute("paginationBarNumbers", barNumbers);
         map.addAttribute("searchTypes", SearchType.values());
+        map.addAttribute("searchTypeHashtag", SearchType.HASHTAG);
         return "postings/index";
     }
 

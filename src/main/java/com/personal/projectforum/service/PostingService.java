@@ -1,10 +1,12 @@
 package com.personal.projectforum.service;
 
+import com.personal.projectforum.domain.Hashtag;
 import com.personal.projectforum.domain.Posting;
 import com.personal.projectforum.domain.UserAccount;
 import com.personal.projectforum.domain.constant.SearchType;
 import com.personal.projectforum.dto.PostingDto;
 import com.personal.projectforum.dto.PostingWithCommentsDto;
+import com.personal.projectforum.repository.HashtagRepository;
 import com.personal.projectforum.repository.PostingRepository;
 import com.personal.projectforum.repository.UserAccountRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -17,6 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import static com.querydsl.core.types.Projections.map;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,8 +30,10 @@ import java.util.List;
 @Service
 public class PostingService {
 
+    private final HashtagService hashtagService;
     private final PostingRepository postingRepository;
     private final UserAccountRepository userAccountRepository;
+    private final HashtagRepository hashtagRepository;
 
     @Transactional(readOnly = true)
     public Page<PostingDto> searchPostings(SearchType searchType, String searchKeyword, Pageable pageable) {
@@ -63,7 +71,11 @@ public class PostingService {
 
     public void savePosting(PostingDto dto) {
         UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
-        postingRepository.save(dto.toEntity(userAccount));
+        Set<Hashtag> hashtags = renewHashtagsFromContent(dto.content());
+
+        Posting posting = dto.toEntity(userAccount);
+        posting.addHashtags(hashtags);
+        postingRepository.save(posting);
     }
 
     public void updatePosting(Long postingId, PostingDto dto) {
@@ -74,6 +86,17 @@ public class PostingService {
             if(posting.getUserAccount().getUserId().equals(userAccount.getUserId())) {
                 if(dto.title() != null) { posting.setTitle(dto.title()); }
                 if(dto.content() != null) { posting.setContent(dto.content()); }
+
+                Set<Long> hashtagIds = posting.getHashtags().stream()
+                        .map(Hashtag::getId)
+                        .collect(Collectors.toUnmodifiableSet());
+                posting.clearHashtags();
+                postingRepository.flush();
+
+                hashtagIds.forEach(hashtagService::deleteHashtagWithoutPostings);
+
+                Set<Hashtag> hashtags = renewHashtagsFromContent(dto.content());
+                posting.addHashtags(hashtags);
             }
         } catch (EntityNotFoundException e) {
             log.warn("Posting Update Failed. Can not find info for updating posting - {}", e.getLocalizedMessage());
@@ -81,8 +104,15 @@ public class PostingService {
     }
 
     public void deletePosting(long postingId, String userId) {
+        Posting posting = postingRepository.getReferenceById(postingId);
 
+        Set<Long> hashtagIds = posting.getHashtags().stream()
+                .map(Hashtag::getId)
+                .collect(Collectors.toUnmodifiableSet());
         postingRepository.deleteByIdAndUserAccount_UserId(postingId, userId);
+        postingRepository.flush();
+
+        hashtagIds.forEach(hashtagService::deleteHashtagWithoutPostings);
     }
 
     public long getPostingCount() {
@@ -90,15 +120,31 @@ public class PostingService {
     }
 
     @Transactional(readOnly = true)
-    public Page<PostingDto> searchPostingsViaHashtag(String hashtag, Pageable pageable) {
-        if(hashtag == null || hashtag.isBlank()) {
+    public Page<PostingDto> searchPostingsViaHashtag(String hashtagName, Pageable pageable) {
+        if(hashtagName == null || hashtagName.isBlank()) {
             return Page.empty(pageable);
         }
 
-        return postingRepository.findByHashtagNames(null, pageable).map(PostingDto::from);
+        return postingRepository.findByHashtagNames(List.of(hashtagName), pageable).map(PostingDto::from);
     }
 
     public List<String> getHashtags() {
-        return postingRepository.findAllDistinctHashtags();
+        return hashtagRepository.findAllHashtagNames(); // TODO: Let's think of moving it to HashtagService
+    }
+
+    private Set<Hashtag> renewHashtagsFromContent(String content) {
+        Set<String> hashtagNamesInContent = hashtagService.parseHashtagNames(content);
+        Set<Hashtag> hashtags = hashtagService.findHashtagsByNames(hashtagNamesInContent);
+        Set<String> existingHashtagNames = hashtags.stream()
+                .map(Hashtag::getHashtagName)
+                .collect(Collectors.toUnmodifiableSet());
+
+        hashtagNamesInContent.forEach(newHashtagName -> {
+            if(!existingHashtagNames.contains(newHashtagName)) {
+                hashtags.add(Hashtag.of(newHashtagName));
+            }
+        });
+
+        return hashtags;
     }
 }

@@ -190,7 +190,7 @@ class PostingCommentServiceTest {
                 "title",
                 "content"
         );
-        posting.addHashtag((Hashtag) Set.of(createHashtag(posting)));
+        posting.addHashtags(Set.of(createHashtag(posting)));
 
         return posting;
     }

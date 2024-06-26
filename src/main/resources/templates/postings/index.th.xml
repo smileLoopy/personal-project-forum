@@ -24,7 +24,7 @@
                 )}"/>
                 <attr sel="th.hashtag/a" th:text="'hashtag'" th:href="@{/postings(
                     page=${postings.number},
-                    sort='hashtag' + (*{sort.getOrderFor('hashtag')} != null ? (*{sort.getOrderFor('hashtag').direction.name} != 'DESC' ? ',desc' : '') : ''),
+                    sort='hashtags' + (*{sort.getOrderFor('hashtags')} != null ? (*{sort.getOrderFor('hashtags').direction.name} != 'DESC' ? ',desc' : '') : ''),
                     searchType=${param.searchType},
                     searchValue=${param.searchValue}
                 )}"/>
@@ -44,7 +44,12 @@
             <attr sel="tbody" th:remove="all-but-first">
                 <attr sel="tr[0]" th:each="posting : ${postings}">
                     <attr sel="td.title/a" th:text="${posting.title}" th:href="@{'/postings/' + ${posting.id}}" />
-                    <attr sel="td.hashtag" th:text="${posting.hashtag}" />
+                    <attr sel="td.hashtag/span" th:each="hashtag : ${posting.hashtags}">
+                        <attr sel="a"
+                              th:text="'#' + ${hashtag}"
+                              th:href="@{/postings(searchType=${searchTypeHashtag},searchValue=${hashtag})}"
+                        />
+                    </attr>
                     <attr sel="td.user-id" th:text="${posting.nickname}" />
                     <attr sel="td.created-at/time" th:datetime="${posting.createdAt}" th:text="${#temporals.format(posting.createdAt, 'yyyy-MM-dd')}" />
                 </attr>

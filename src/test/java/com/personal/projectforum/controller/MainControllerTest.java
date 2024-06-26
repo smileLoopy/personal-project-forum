@@ -1,9 +1,11 @@
 package com.personal.projectforum.controller;
 
 import com.personal.projectforum.config.SecurityConfig;
+import com.personal.projectforum.repository.UserAccountRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
@@ -20,6 +22,9 @@ class MainControllerTest {
     MainControllerTest(@Autowired MockMvc mvc) {
         this.mvc = mvc;
     }
+
+    @MockBean
+    private UserAccountRepository userAccountRepository;
 
     @Test
     void givenNothing_whenRequestingRootPage_thenRedirectsToPostingsPage() throws Exception {

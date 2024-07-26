@@ -13,6 +13,7 @@ public record PostingCommentDto(
         Long id,
         Long postingId,
         UserAccountDto userAccountDto,
+        Long parentCommentId,
         String content,
         LocalDateTime createdAt,
         String createdBy,
@@ -20,12 +21,16 @@ public record PostingCommentDto(
         String modifiedBy
 ) {
 
-  public static PostingCommentDto of(Long articleId, UserAccountDto userAccountDto, String content) {
-    return new PostingCommentDto(null, articleId, userAccountDto, content, null, null, null, null);
+  public static PostingCommentDto of(Long postingId, UserAccountDto userAccountDto, String content) {
+    return PostingCommentDto.of(postingId, userAccountDto, null, content);
   }
 
-  public static PostingCommentDto of(Long id, Long articleId, UserAccountDto userAccountDto, String content, LocalDateTime createdAt, String createdBy, LocalDateTime modifiedAt, String modifiedBy) {
-    return new PostingCommentDto(id, articleId, userAccountDto, content, createdAt, createdBy, modifiedAt, modifiedBy);
+  public static PostingCommentDto of(Long postingId, UserAccountDto userAccountDto, Long parentCommentId, String content) {
+    return PostingCommentDto.of(null, postingId, userAccountDto, parentCommentId, content, null, null, null, null);
+  }
+
+  public static PostingCommentDto of(Long id, Long postingId, UserAccountDto userAccountDto, Long parentCommentId, String content, LocalDateTime createdAt, String createdBy, LocalDateTime modifiedAt, String modifiedBy) {
+    return new PostingCommentDto(id, postingId, userAccountDto, parentCommentId, content, createdAt, createdBy, modifiedAt, modifiedBy);
   }
 
   public static PostingCommentDto from(PostingComment entity) {
@@ -33,6 +38,7 @@ public record PostingCommentDto(
             entity.getId(),
             entity.getPosting().getId(),
             UserAccountDto.from(entity.getUserAccount()),
+            entity.getParentCommentId(),
             entity.getContent(),
             entity.getCreatedAt(),
             entity.getCreatedBy(),

@@ -38,7 +38,15 @@ public class PostingCommentService {
         try {
             Posting posting = postingRepository.getReferenceById(dto.postingId());
             UserAccount userAccount = userAccountRepository.getReferenceById(dto.userAccountDto().userId());
-            postingCommentRepository.save(dto.toEntity(posting, userAccount));
+            PostingComment postingComment = dto.toEntity(posting, userAccount);
+
+            if (dto.parentCommentId() != null) {
+                PostingComment parentCommnet = postingCommentRepository.getReferenceById(dto.parentCommentId());
+                parentCommnet.addChildComment(postingComment);
+            } else {
+                postingCommentRepository.save(postingComment);
+            }
+
         } catch (EntityNotFoundException e) {
             log.warn("Failed to save comment. Can not find info for creating comment - : {}", e.getLocalizedMessage());
         }

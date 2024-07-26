@@ -88,5 +88,27 @@ class PostingCommentControllerTest {
         then(postingCommentService).should().deletePostingComment(postingCommentId, userId);
     }
 
+    @WithUserDetails(value = "eunahTest", setupBefore = TestExecutionEvent.TEST_EXECUTION)
+    @DisplayName("[view][POST] Save child comment - Normal Retrieval")
+    @Test
+    void givenPostingCommentInfoWithParentCommentId_whenRequesting_thenSavesNewChildComment() throws Exception {
+        // Given
+        long postingId = 1L;
+        PostingCommentRequest request = PostingCommentRequest.of(postingId, 1L, "test comment");
+        willDoNothing().given(postingCommentService).savePostingComment(any(PostingCommentDto.class));
+
+        // When & Then
+        mvc.perform(
+                        post("/comments/new")
+                                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                                .content(formDataEncoder.encode(request))
+                                .with(csrf())
+                )
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/postings/" + postingId))
+                .andExpect(redirectedUrl("/postings/" + postingId));
+        then(postingCommentService).should().savePostingComment(any(PostingCommentDto.class));
+    }
+
 
 }

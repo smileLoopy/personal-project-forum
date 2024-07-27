@@ -2,7 +2,9 @@ package com.personal.projectforum.repository;
 
 import com.personal.projectforum.domain.Hashtag;
 import com.personal.projectforum.domain.Posting;
+import com.personal.projectforum.domain.PostingComment;
 import com.personal.projectforum.domain.UserAccount;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +113,71 @@ class JPARepositoryTest {
         assertThat(postingRepository.count()).isEqualTo(previousPostingCount - 1);
         assertThat(postingCommentRepository.count()).isEqualTo(previousPostingCommentCont - deletedCommentsSize);
 
+    }
+
+    @DisplayName("select child comments test")
+    @Test
+    void givenParentCommentId_whenSelecting_thenReturnsChildComments() {
+        // Given
+
+        // When
+        Optional<PostingComment> parentComment = postingCommentRepository.findById(1L);
+
+        // Then
+        assertThat(parentComment).get()
+                .hasFieldOrPropertyWithValue("parentCommentId", null)
+                .extracting("childComments", InstanceOfAssertFactories.COLLECTION)
+                .hasSize(4);
+
+    }
+
+    @DisplayName("insert comment to the comment test")
+    @Test
+    void givenParentComment_whenSaving_thenInsertsChildComment() {
+        // Given
+        PostingComment parentComment = postingCommentRepository.getReferenceById(1L);
+        PostingComment childComment = PostingComment.of(
+                parentComment.getPosting(),
+                parentComment.getUserAccount(),
+                "대댓글"
+        );
+
+        // When
+        parentComment.addChildComment(childComment);
+        postingCommentRepository.flush();
+
+        // Then
+        assertThat(postingCommentRepository.findById(1L)).get()
+                .hasFieldOrPropertyWithValue("parentCommentId", null)
+                .extracting("childComments", InstanceOfAssertFactories.COLLECTION)
+                .hasSize(5);
+    }
+
+    @DisplayName("delete parent comment having child comment test")
+    @Test
+    void givenPostingCommentHavingChildComments_whenDeletingParentComment_thenDeletesEveryComment() {
+        // Given
+        PostingComment parentComment = postingCommentRepository.getReferenceById(1L);
+        long previousPostingCommentCount = postingCommentRepository.count();
+
+        // When
+        postingCommentRepository.delete(parentComment);
+
+        // Then
+        assertThat(postingCommentRepository.count()).isEqualTo(previousPostingCommentCount - 5); // 테스트 댓글 + 대댓글 4개
+    }
+
+    @DisplayName("delete parent comment having child comment & user Id test")
+    @Test
+    void givenPostingCommentIdHavingChildCommentsAndUserId_whenDeletingParentComment_thenDeletesEveryComment() {
+        // Given
+        long previousPostingCommentCount = postingCommentRepository.count();
+
+        // When
+        postingCommentRepository.deleteByIdAndUserAccount_UserId(1L, "eunah");
+
+        // Then
+        assertThat(postingCommentRepository.count()).isEqualTo(previousPostingCommentCount - 5); // 테스트 댓글 + 대댓글 4개
     }
 
 

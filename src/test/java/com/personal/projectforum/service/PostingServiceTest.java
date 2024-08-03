@@ -46,7 +46,7 @@ class PostingServiceTest {
     @Mock private UserAccountRepository userAccountRepository;
     @Mock private HashtagRepository hashtagRepository;
 
-    @DisplayName("Searching posting without search keyword, return posting page")
+    @DisplayName("Searching posting without search keyword, return posting page.")
     @Test
     void givenNoSearchParameters_whenSearchingPostings_thenReturnsPostingPage() {
         // Given
@@ -93,7 +93,7 @@ class PostingServiceTest {
         then(postingRepository).shouldHaveNoInteractions();
     }
 
-    @DisplayName("Searching not exist hashtag, return empty page")
+    @DisplayName("Searching not exist hashtag, return empty page.")
     @Test
     void givenNonexistentHashtag_whenSearchingPostingsViaHashtag_thenReturnsEmptyPage() {
         // Given
@@ -166,7 +166,7 @@ class PostingServiceTest {
     }
 
 
-    @DisplayName("Searching posting, return posting")
+    @DisplayName("Searching posting, return posting.")
     @Test
     void givenPostingId_whenSearchingPosting_thenReturnsPosting() {
         // Given
@@ -230,7 +230,7 @@ class PostingServiceTest {
         then(postingRepository).should().save(any(Posting.class));
     }
 
-    @DisplayName("Input posting ID and modify info of posting, update posting")
+    @DisplayName("Input posting ID and modify info of posting, update posting.")
     @Test
     void givenModifiedPostingInfo_whenUpdatingPosting_thenUpdatesPosting() {
         // Given
@@ -281,7 +281,7 @@ class PostingServiceTest {
         then(hashtagService).shouldHaveNoInteractions();
     }
 
-    @DisplayName("If other user try to update the posting, do nothing")
+    @DisplayName("If other user try to update the posting, do nothing.")
     @Test
     void givenModifiedPostingInfoWithDifferentUser_whenUpdatingPosting_thenDoesNothing() {
         // Given
@@ -301,7 +301,7 @@ class PostingServiceTest {
         then(hashtagService).shouldHaveNoInteractions();
     }
 
-    @DisplayName("Input posting ID, delete posting")
+    @DisplayName("Input posting ID, delete posting.")
     @Test
     void givenPostingId_whenDeletingPosting_thenDeletesPosting() {
         // Given
@@ -321,7 +321,7 @@ class PostingServiceTest {
         then(hashtagService).should(times(2)).deleteHashtagWithoutPostings(any());
     }
 
-    @DisplayName("Search posting count, return posting count")
+    @DisplayName("Search posting count, return posting count.")
     @Test
     void givenNothing_whenCountingPostings_thenReturnsPostingCount() {
         // Given
@@ -336,7 +336,7 @@ class PostingServiceTest {
         then(postingRepository).should().count();
     }
 
-    @DisplayName("Search hashtag, return unique list of hashtags")
+    @DisplayName("Search hashtag, return unique list of hashtags.")
     @Test
     void givenNothing_whenCalling_thenReturnsHashtags() {
         // Given

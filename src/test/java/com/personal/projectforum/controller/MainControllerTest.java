@@ -2,6 +2,7 @@ package com.personal.projectforum.controller;
 
 import com.personal.projectforum.config.SecurityConfig;
 import com.personal.projectforum.repository.UserAccountRepository;
+import com.personal.projectforum.service.UserAccountService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -25,6 +26,9 @@ class MainControllerTest {
 
     @MockBean
     private UserAccountRepository userAccountRepository;
+
+    @MockBean
+    private UserAccountService userAccountService;
 
     @Test
     void givenNothing_whenRequestingRootPage_thenRedirectsToPostingsPage() throws Exception {

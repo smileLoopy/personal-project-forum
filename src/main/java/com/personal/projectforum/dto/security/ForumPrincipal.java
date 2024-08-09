@@ -23,7 +23,7 @@ public record ForumPrincipal(
 ) implements UserDetails, OAuth2User {
 
     public static ForumPrincipal of(String username, String password, String email, String nickname, String memo) {
-        return of(username, password, email, nickname, memo, Map.of());
+        return ForumPrincipal.of(username, password, email, nickname, memo, Map.of());
     }
 
     public static ForumPrincipal of(String username, String password, String email, String nickname, String memo, Map<String, Object> oAuth2Attributes) {

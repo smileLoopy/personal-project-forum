@@ -61,6 +61,19 @@ public class SecurityConfig {
                 .orElseThrow(() -> new UsernameNotFoundException("User not found - username: " + username));
     }
 
+    /**
+     * <p>
+     * Processes authentication information using OAuth 2.0 technology.
+     * Select the Kakao authentication method.
+     *
+     * <p>
+     * TODO: Code that is bound to the Kakao domain. Considering expansion, it would be better to separate it into a separate authentication processing service class, but since we do not currently plan to use other OAuth authentication platforms, we will finish it like this.
+     *
+     * @param userAccountService Service logic that handles the user account of the forum service
+     * @param passwordEncoder Password encryption tool
+     * @return {@link OAuth2UserService} Returns a service instance that reads and processes OAuth2 authentication user information
+     */
+
     @Bean
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService(
             UserAccountService userAccountService,

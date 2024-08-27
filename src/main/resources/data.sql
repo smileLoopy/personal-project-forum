@@ -6,6 +6,9 @@ insert into user_account (user_id, user_password, nickname, email, memo, created
 insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values
 ('eunah2', '{noop}1234', 'Eunah2', 'eunah2@mail.com', 'I am Eunah2.', now(), 'eunah2', now(), 'eunah2')
 ;
+insert into user_account (user_id, user_password, nickname, email, memo, created_at, created_by, modified_at, modified_by) values
+    ('eunah3', '{noop}1234', 'Eunah3', 'eunah3@mail.com', 'I am Eunah3.', now(), 'eunah3', now(), 'eunah3')
+;
 
 -- 123 postings
 insert into posting (user_id, title, content, created_by, modified_by, created_at, modified_at) values

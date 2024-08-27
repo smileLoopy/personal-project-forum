@@ -65,7 +65,7 @@ class JPARepositoryTest {
         // Given
         long previousCount = postingRepository.count();
         UserAccount userAccount = userAccountRepository.save(UserAccount.of("newEunah", "pw", null, null, null));
-        Posting posting = Posting.of(userAccount, "new article", "new content");
+        Posting posting = Posting.of(userAccount, "new posting", "new content");
         posting.addHashtags(Set.of(Hashtag.of("spring")));
 
         // When

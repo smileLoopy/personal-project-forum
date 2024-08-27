@@ -2,6 +2,7 @@ package com.personal.projectforum.repository;
 
 import com.personal.projectforum.domain.PostingComment;
 import com.personal.projectforum.domain.QPostingComment;
+import com.personal.projectforum.domain.projection.PostingCommentProjection;
 import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.StringExpression;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,7 +13,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
 
-@RepositoryRestResource
+@RepositoryRestResource(excerptProjection = PostingCommentProjection.class)
 public interface PostingCommentRepository extends
         JpaRepository<PostingComment, Long>,
         QuerydslPredicateExecutor<PostingComment>,

@@ -1,9 +1,10 @@
 package com.personal.projectforum.repository;
 
 import com.personal.projectforum.domain.UserAccount;
+import com.personal.projectforum.domain.projection.UserAccountProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-@RepositoryRestResource
+@RepositoryRestResource(excerptProjection = UserAccountProjection.class)
 public interface UserAccountRepository extends JpaRepository<UserAccount, String> {
 }

@@ -2,6 +2,7 @@ package com.personal.projectforum.repository;
 
 import com.personal.projectforum.domain.Posting;
 import com.personal.projectforum.domain.QPosting;
+import com.personal.projectforum.domain.projection.PostingProjection;
 import com.personal.projectforum.repository.querydsl.PostingRepositoryCustom;
 import com.querydsl.core.types.dsl.DateTimeExpression;
 import com.querydsl.core.types.dsl.StringExpression;
@@ -13,7 +14,7 @@ import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
 import org.springframework.data.querydsl.binding.QuerydslBindings;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-@RepositoryRestResource
+@RepositoryRestResource(excerptProjection = PostingProjection.class)
 public interface PostingRepository extends
         JpaRepository<Posting, Long>,
         PostingRepositoryCustom,
